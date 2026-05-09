@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Mamá</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <h1>Galería de Mamá</h1>
+            <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="site-nav">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="site-nav">
+                <a href="/" class="nav-btn">Inicio</a>
+                <a href="/carta" class="nav-btn">Carta</a>
+                <a href="/galeria" class="nav-btn">Galería</a>
+                <a href="/cancion" class="nav-btn">Canción</a>
+                <a href="/escribeme" class="nav-btn">Escríbeme</a>
+                <button id="color-btn" class="cta">Cambiar Color</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container gallery-page">
+        <section class="letter-hero gallery-hero">
+            <div class="intro-kicker">Recuerdos de mamá</div>
+            <h2 class="hero-title">Momentos que se sienten como hogar</h2>
+            <p class="hero-desc">una galeria con fotos de nuestra familia y aparecerán aquí automáticamente.</p>
+        </section>
+
+        <section class="apple-gallery" aria-label="Fotos de mamá">
+            <div class="photo-mosaic">
+                {% if photos %}
+                    {% for photo in photos %}
+                        <figure class="photo-tile tile-{{ loop.index % 7 }}">
+                            <img src="{{ photo.src }}" alt="{{ photo.alt }}">
+                            <figcaption>{{ photo.alt }}</figcaption>
+                        </figure>
+                    {% endfor %}
+                {% else %}
+                    {% for item in range(1, 13) %}
+                        <figure class="photo-tile photo-placeholder tile-{{ item % 7 }}">
+                            <span>Foto {{ item }}</span>
+                            <figcaption>Recuerdo para mamá</figcaption>
+                        </figure>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="memory-slider-section" aria-label="Slider de recuerdos">
+            <div class="dashboard-top">
+                <span class="status-dot"></span>
+                <span>Recopilación de recuerdos</span>
+                <strong>SLIDER</strong>
+            </div>
+            <div class="memory-slider">
+                <button class="memory-nav memory-prev" type="button" aria-label="Foto anterior">‹</button>
+                <div class="memory-window">
+                    <div class="memory-track">
+                        {% if photos %}
+                            {% for photo in photos %}
+                                <div class="memory-slide">
+                                    <img src="{{ photo.src }}" alt="{{ photo.alt }}">
+                                    <div class="memory-caption">{{ photo.alt }}</div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {% for item in range(1, 7) %}
+                                <div class="memory-slide memory-placeholder">
+                                    <span>Recuerdo {{ item }}</span>
+                                    <div class="memory-caption">Aquí irá una foto de mamá</div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <button class="memory-nav memory-next" type="button" aria-label="Foto siguiente">›</button>
+            </div>
+            <div class="memory-dots"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Feliz Día de la Madre. Hecho por Gabriel Acosta.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

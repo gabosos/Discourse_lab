@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Día de la Madre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body{% if show_intro %} class="intro-lock"{% endif %}>
+    {% if show_intro %}
+    <section class="dev-intro" id="dev-intro" aria-label="Intro especial del Día de la Madre">
+        <canvas id="intro-canvas" aria-hidden="true"></canvas>
+        <div class="intro-grid" aria-hidden="true"></div>
+        <div class="intro-noise" aria-hidden="true"></div>
+
+        <div class="intro-loader" id="intro-loader">
+            <div class="loader-core">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <p>Preparando una sorpresa para mamá</p>
+        </div>
+
+        <div class="intro-shell" id="intro-shell">
+            <div class="intro-copy">
+                <div class="intro-kicker">Una página hecha con amor</div>
+                <h2 class="intro-name">Para Mamá</h2>
+                <p class="intro-tagline" id="intro-tagline">Porque ningún código puede medir todo lo que significas para mí.</p>
+
+                <div class="stack-marquee" aria-label="Detalles de amor para mamá">
+                    <span>Amor infinito</span>
+                    <span>Gracias por todo</span>
+                    <span>Tu ternura</span>
+                    <span>Tu fuerza</span>
+                    <span>Nuestros recuerdos</span>
+                    <span>Feliz día</span>
+                </div>
+
+                <div class="intro-actions">
+                    <button class="enter-btn" id="enter-site" type="button">Ver tu sorpresa</button>
+                    <button class="sound-btn" id="sound-toggle" type="button" aria-pressed="false">Brillo suave</button>
+                </div>
+            </div>
+
+            <div class="future-dashboard" id="future-dashboard" aria-label="Carta especial para mamá">
+                <div class="dashboard-top">
+                    <span class="status-dot"></span>
+                    <span>Carta para mamá</span>
+                    <strong>CON AMOR</strong>
+                </div>
+                <div class="terminal-panel">
+                    <div class="terminal-bar">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <pre id="code-stream"></pre>
+                </div>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <span>Amor</span>
+                        <strong>∞</strong>
+                    </div>
+                    <div class="metric-card">
+                        <span>Gracias</span>
+                        <strong>Siempre</strong>
+                    </div>
+                    <div class="metric-card">
+                        <span>Recuerdos</span>
+                        <strong>Vivos</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <header>
+        <div class="header-inner">
+            <h1>Feliz Día de la Madre</h1>
+            <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="site-nav">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="site-nav">
+                <a href="/" class="nav-btn">Inicio</a>
+                <a href="/carta" class="nav-btn">Carta</a>
+                <a href="/galeria" class="nav-btn">Galería</a>
+                <a href="/cancion" class="nav-btn">Canción</a>
+                <a href="/escribeme" class="nav-btn">Escríbeme</a>
+                <button id="color-btn" class="cta">Cambiar Color</button>
+            </nav>
+        </div>
+    </header>
+    <main class="container">
+        <section class="hero" id="inicio">
+            <div class="hero-inner">
+                <div class="hero-left">
+                    <h2 class="hero-title">Un mensaje lleno de amor para ti</h2>
+                    <p class="hero-desc">Querida Mamá, en este día especial quiero decirte cuánto te amo y te agradezco por todo lo que has hecho por mí. ¡Feliz Día de la Madre!</p>
+                </div>
+                <div class="hero-right">
+                    <img src="{{ url_for('static', filename='images/mamamamma.jpg') }}" alt="Mamá y yo" class="hero-image">
+                </div>
+            </div>
+        </section>
+        <section class="web-slider">
+            <div class="slider-window">
+                <div class="slider-track">
+                    <div class="slide-card">
+                        <img src="{{ url_for('static', filename='images/slide1.jpg') }}" alt="Recuerdo 1">
+                        <div class="slide-overlay">
+                            <div class="slide-title">Nuestros Momentos Especiales</div>
+                            <div class="slide-copy">Recuerdos que atesoramos juntos.</div>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <img src="{{ url_for('static', filename='images/slide2.jpg') }}" alt="Recuerdo 2">
+                        <div class="slide-overlay">
+                            <div class="slide-title">Aventuras Compartidas</div>
+                            <div class="slide-copy">Momentos inolvidables que hemos vivido.</div>
+                        </div>
+                    </div>
+                    <div class="slide-card">
+                        <img src="{{ url_for('static', filename='images/slide3.jpg') }}" alt="Recuerdo 3">
+                        <div class="slide-overlay">
+                            <div class="slide-title">Amor Eterno</div>
+                            <div class="slide-copy">Gracias por ser mi guía y mi amor.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="slider-nav prev">‹</button>
+            <button class="slider-nav next">›</button>
+            <div class="slider-dots">
+                <button class="slider-dot"></button>
+                <button class="slider-dot"></button>
+                <button class="slider-dot"></button>
+            </div>
+        </section>
+        <section class="messages" id="mensajes">
+            <h2>Palabras para Mamá</h2>
+            <div class="message-grid">
+                <div class="message-card">
+                    <div class="message-icon">💖</div>
+                    <h3>Tu Amor</h3>
+                    <p>Infinito y incondicional, siempre está ahí para mí</p>
+                </div>
+                <div class="message-card">
+                    <div class="message-icon">🌟</div>
+                    <h3>Tu Fuerza</h3>
+                    <p>Eres mi inspiración, mi ejemplo a seguir</p>
+                </div>
+                <div class="message-card">
+                    <div class="message-icon">🤗</div>
+                    <h3>Tu Ternura</h3>
+                    <p>Cada abrazo es un refugio seguro</p>
+                </div>
+                <div class="message-card">
+                    <div class="message-icon">✨</div>
+                    <h3>Tu Sabiduría</h3>
+                    <p>Tus consejos iluminan mi camino</p>
+                </div>
+                <div class="message-card">
+                    <div class="message-icon">🌹</div>
+                    <h3>Tu Belleza</h3>
+                    <p>Interior y exterior, eres simplemente hermosa</p>
+                </div>
+                <div class="message-card">
+                    <div class="message-icon">🎀</div>
+                    <h3>Tu Dedicación</h3>
+                    <p>Todo lo que haces, lo haces con amor</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer id="contacto">
+        <p>&copy; 2023 Feliz Día de la Madre. Hecho por Gabriel Acosta.</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

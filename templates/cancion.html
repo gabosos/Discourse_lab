@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canciones para Mamá</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="music-spotify-body">
+    <header>
+        <div class="header-inner">
+            <h1>Canciones para Mamá</h1>
+            <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="site-nav">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav" id="site-nav">
+                <a href="/" class="nav-btn">Inicio</a>
+                <a href="/carta" class="nav-btn">Carta</a>
+                <a href="/galeria" class="nav-btn">Galería</a>
+                <a href="/cancion" class="nav-btn nav-btn--active" aria-current="page">Canción</a>
+                <a href="/escribeme" class="nav-btn">Escríbeme</a>
+                <button id="color-btn" class="cta">Cambiar Color</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="music-spotify-page-shell">
+    <div class="music-spotify-layout">
+        <aside class="music-spotify-sidebar" aria-label="Biblioteca">
+            <div class="music-spotify-brand">
+                <span class="music-spotify-logo" aria-hidden="true">♪</span>
+                <div>
+                    <strong>Mamá Music</strong>
+                    <span>Hecho con amor</span>
+                </div>
+            </div>
+            <nav class="music-spotify-side-nav">
+                <a href="/" class="music-spotify-side-link">Inicio</a>
+                <a href="/cancion" class="music-spotify-side-link is-active">Tu playlist</a>
+                <a href="/carta" class="music-spotify-side-link">Carta</a>
+                <a href="/galeria" class="music-spotify-side-link">Galería</a>
+            </nav>
+            <p class="music-spotify-hint">Agrega archivos de audio en <code>static/audio</code>. Opcional: portadas en <code>static/audio/covers</code> con el mismo nombre que la canción.</p>
+        </aside>
+
+        <div class="music-spotify-main">
+            <div class="music-spotify-hero">
+                <div class="music-spotify-hero-art" id="music-hero-cover" aria-hidden="true">
+                    <div class="music-spotify-hero-placeholder">💗</div>
+                </div>
+                <div class="music-spotify-hero-meta">
+                    <span class="music-spotify-hero-label">Playlist</span>
+                    <h2 class="music-spotify-hero-title">Para mamá</h2>
+                    <p class="music-spotify-hero-desc">Canciones que te recuerdan cuánto te queremos.</p>
+                    <p class="music-spotify-hero-count"><span id="music-track-count">{{ tracks|length }}</span> canciones</p>
+                    <button type="button" class="music-spotify-play-big" id="music-play-playlist" {% if not tracks %}disabled{% endif %}>
+                        <span aria-hidden="true">▶</span> Reproducir
+                    </button>
+                </div>
+            </div>
+
+            <section class="music-spotify-list-wrap" aria-label="Lista de canciones">
+                <div class="music-spotify-list-head">
+                    <span>#</span>
+                    <span class="music-spotify-head-spacer" aria-hidden="true"></span>
+                    <span>Título</span>
+                    <span class="music-spotify-col-album">Álbum</span>
+                    <span class="music-spotify-col-time">⏱</span>
+                </div>
+                <ol class="music-spotify-list" id="music-track-list">
+                    {% if tracks %}
+                        {% for t in tracks %}
+                            <li>
+                                <button type="button" class="music-spotify-row" data-index="{{ loop.index0 }}">
+                                    <span class="music-spotify-idx">{{ loop.index }}</span>
+                                    <span class="music-spotify-play-ico" aria-hidden="true">▶</span>
+                                    <span class="music-spotify-thumb">
+                                        {% if t.cover %}
+                                            <img src="{{ t.cover }}" alt="" width="40" height="40">
+                                        {% else %}
+                                            <span class="music-spotify-thumb-fallback">♪</span>
+                                        {% endif %}
+                                    </span>
+                                    <span class="music-spotify-track-info">
+                                        <span class="music-spotify-track-title">{{ t.title }}</span>
+                                        <span class="music-spotify-track-artist">{{ t.artist }}</span>
+                                    </span>
+                                    <span class="music-spotify-album">Para mamá</span>
+                                    <span class="music-spotify-dur" data-duration-for="{{ loop.index0 }}">—:—</span>
+                                </button>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="music-spotify-empty">
+                            <p>Aún no hay canciones en la carpeta.</p>
+                            <p>Copia tus archivos <strong>.mp3</strong> (u otros formatos soportados) dentro de <code>static/audio</code> y recarga esta página.</p>
+                        </li>
+                    {% endif %}
+                </ol>
+            </section>
+        </div>
+    </div>
+
+    
+    <div class="music-spotify-player" role="region" aria-label="Reproductor">
+        <div class="music-spotify-player-inner">
+            <div class="music-spotify-now">
+                <div class="music-spotify-now-art" id="player-cover">
+                    <span class="music-spotify-now-placeholder">♪</span>
+                </div>
+                <div class="music-spotify-now-text">
+                    <span class="music-spotify-now-title" id="player-title">—</span>
+                    <span class="music-spotify-now-artist" id="player-artist">—</span>
+                </div>
+            </div>
+            <div class="music-spotify-controls">
+                <div class="music-spotify-transport">
+                    <button type="button" class="music-spotify-btn-icon" id="player-prev" aria-label="Anterior" title="Anterior">⏮</button>
+                    <button type="button" class="music-spotify-btn-play" id="player-play" aria-label="Reproducir" title="Reproducir">▶</button>
+                    <button type="button" class="music-spotify-btn-icon" id="player-next" aria-label="Siguiente" title="Siguiente">⏭</button>
+                </div>
+                <div class="music-spotify-progress-wrap">
+                    <span class="music-spotify-time" id="player-current">0:00</span>
+                    <input type="range" class="music-spotify-progress" id="player-progress" min="0" max="100" value="0" aria-label="Progreso de la canción">
+                    <span class="music-spotify-time" id="player-end">0:00</span>
+                </div>
+            </div>
+            <div class="music-spotify-extra" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <audio id="music-audio" preload="metadata" crossorigin="anonymous"></audio>
+    <script id="music-tracks-data" type="application/json">{{ tracks|tojson }}</script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/music.js') }}"></script>
+</body>
+</html>
