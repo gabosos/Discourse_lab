@@ -1,7 +1,7 @@
 import sqlite3
 
 def init_db():
-    conn = sqlite3.connect('mothers_day.db')
+    conn = sqlite3.connect(':memory:')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS messages (
                     id INTEGER PRIMARY KEY,
@@ -21,7 +21,7 @@ def init_db():
     conn.close()
 
 def get_messages():
-    conn = sqlite3.connect('mothers_day.db')
+    conn = sqlite3.connect(':memory:')
     c = conn.cursor()
     c.execute("SELECT message FROM messages")
     messages = [row[0] for row in c.fetchall()]

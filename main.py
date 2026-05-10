@@ -108,7 +108,7 @@ def messages():
     return redirect('/cancion')
 
 def save_message(message):
-    conn = sqlite3.connect('mothers_day.db')
+    conn = sqlite3.connect(':memory:')
     c = conn.cursor()
     c.execute("INSERT INTO messages (message) VALUES (?)", (message,))
     conn.commit()
