@@ -9,6 +9,8 @@ import db
 
 app = Flask(__name__)
 
+db.init_db()
+
 def get_gallery_photos():
     image_dir = Path(app.static_folder) / 'photo-galery'
     if not image_dir.exists():
@@ -130,5 +132,4 @@ def escribeme():
     return render_template('escribeme.html', messages=messages)
 
 if __name__ == '__main__':
-    db.init_db()
     app.run(debug=True)
