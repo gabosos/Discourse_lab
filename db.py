@@ -1,7 +1,14 @@
 import sqlite3
+import os
+from pathlib import Path
+
+# Usar /tmp en Vercel, directorio actual en local
+DB_PATH = os.environ.get('DB_PATH', 'mothers_day.db')
+if os.environ.get('VERCEL'):
+    DB_PATH = '/tmp/mothers_day.db'
 
 def init_db():
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS messages (
                     id INTEGER PRIMARY KEY,
@@ -21,7 +28,7 @@ def init_db():
     conn.close()
 
 def get_messages():
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT message FROM messages")
     messages = [row[0] for row in c.fetchall()]

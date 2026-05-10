@@ -2,12 +2,18 @@ from __future__ import annotations
 
 import re
 import sqlite3
+import os
 from pathlib import Path
 
 from flask import Flask, redirect, render_template, url_for, request, jsonify
 import db
 
 app = Flask(__name__)
+
+# Usar /tmp en Vercel, directorio actual en local
+DB_PATH = os.environ.get('DB_PATH', 'mothers_day.db')
+if os.environ.get('VERCEL'):
+    DB_PATH = '/tmp/mothers_day.db'
 
 db.init_db()
 
@@ -108,7 +114,7 @@ def messages():
     return redirect('/cancion')
 
 def save_message(message):
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(db.DB_PATH)
     c = conn.cursor()
     c.execute("INSERT INTO messages (message) VALUES (?)", (message,))
     conn.commit()
