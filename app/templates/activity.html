@@ -298,12 +298,7 @@
     const canvas = document.getElementById('activityCanvas');
     canvas.innerHTML = '<p class="dl-muted">Clasifica cada término en la categoría correcta.</p>';
     const container = document.createElement('div');
-    container.style.display = 'grid';
-    container.style.gridTemplateColumns = 'minmax(0, 1.4fr) minmax(220px, 420px)';
-    container.style.gap = '0.9rem 1.5rem';
-    container.style.alignItems = 'center';
-    container.style.maxWidth = '980px';
-    container.style.margin = '0 auto';
+    container.className = 'dl-classification';
 
     payload.items?.forEach((item) => {
       const label = document.createElement('span');
@@ -317,6 +312,7 @@
       label.style.wordBreak = 'break-word';
 
       const select = document.createElement('select');
+      select.className = 'dl-classification-select';
       select.style.width = '100%';
       select.style.minHeight = '52px';
       select.style.height = '52px';

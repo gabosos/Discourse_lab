@@ -14,16 +14,8 @@ def init_db():
                     id INTEGER PRIMARY KEY,
                     message TEXT NOT NULL
                 )''')
-    # Insert some sample messages
-    messages = [
-        "¡Feliz Día de la Madre! Eres la mejor.",
-        "Gracias por todo lo que haces, mamá.",
-        "Te quiero mucho, feliz Día de la Madre.",
-        "Eres mi inspiración, mamá.",
-        "¡Feliz Día de la Madre! Disfruta tu día."
-    ]
-    for msg in messages:
-        c.execute("INSERT OR IGNORE INTO messages (message) VALUES (?)", (msg,))
+    # No holiday-specific sample messages are inserted by default.
+    # Keep the `messages` table empty unless the application explicitly adds records.
     conn.commit()
     conn.close()
 

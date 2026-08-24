@@ -105,6 +105,9 @@
             {% endif %}
           </button>
           {% if student is defined %}
+          {% if student.role == 'teacher' %}
+          <a class="dl-btn dl-btn-primary dl-btn-sm" href="{{ url_for('main.teacher_dashboard') }}" title="Panel docente">Panel docente</a>
+          {% endif %}
           <a href="{{ url_for('main.profile') }}" class="dl-avatar" title="{{ student.name }}">{{ student.initials }}</a>
           <a class="dl-btn dl-btn-ghost dl-btn-sm" href="{{ url_for('main.logout') }}">Salir</a>
           {% endif %}

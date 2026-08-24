@@ -561,6 +561,22 @@ p { margin: 0; }
   .dl-dashboard-grid { grid-template-columns: 1fr; }
   .dl-stats-row { grid-template-columns: repeat(2, 1fr); }
 }
+/* Responsive classification layout for activity canvas */
+.dl-classification {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 420px);
+  gap: 0.9rem 1.5rem;
+  align-items: center;
+  max-width: 980px;
+  margin: 0 auto;
+}
+.dl-classification-select { width: 100%; min-height: 52px; height: 52px; border-radius: 0.9rem; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); color: inherit; padding: 0 1rem; }
+@media (max-width: 520px) {
+  .dl-classification { grid-template-columns: 1fr; gap: 0.6rem; }
+  .dl-classification .dl-classification-select { min-width: 0; }
+  #activityCanvas { padding: 0.75rem; }
+  .dl-activity-body h4 { font-size: 1rem; }
+}
 @media (max-width: 768px) {
   .dl-sidebar { transform: translateX(-100%); }
   .dl-sidebar.open { transform: translateX(0); }

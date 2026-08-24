@@ -221,6 +221,8 @@ def _dashboard_metrics(student: dict) -> dict:
 
 
 def _context(**extra):
+    # Ensure session reflects the persisted user record when possible
+    _load_student()
     student = session.get("student", _default_student())
     if "xp_in_level" not in student or "xp_remaining" not in student:
         xp = student.get("xp", 0)
@@ -247,7 +249,7 @@ def _get_level(level_id: int):
 
 @main_bp.route("/", methods=["GET", "POST"])
 def home():
-    if request.method == "POST":
+    if request.method == 'POST':
         username = request.form.get("username", "")[:32].strip()
         if username:
             user = get_user_by_username(username)
