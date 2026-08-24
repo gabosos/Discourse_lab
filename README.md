@@ -1,39 +1,38 @@
-# Feliz Día de la Madre - Aplicación Flask
+# Discourse Lab
 
-Esta es una aplicación web simple creada con Flask para celebrar el Día de la Madre.
+Discourse Lab es una plataforma educativa gamificada orientada a contenido de lingüística y discurso organizacional.
 
-## Instalación
+## Requisitos
 
-1. Instala las dependencias:
-   ```
-   pip install -r requirements.txt
-   ```
+- Python 3.9+
+- Node.js 20+
+- npm
 
-2. Ejecuta la aplicación:
-   ```
-   python main.py
-   ```
+## Instalación backend
 
-3. Abre tu navegador y ve a `http://127.0.0.1:5000/`
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-## Características
+## Instalación frontend
 
-- Página de inicio con mensaje de Feliz Día de la Madre
-- Base de datos SQLite con mensajes de amor
-- Estilo rosa con efectos hover en botones
-- Botón para cambiar el color de fondo aleatoriamente
-- Navegación simple con botones en el header
+```bash
+cd frontend
+npm install
+```
 
-## Estructura del Proyecto
+## Ejecución
 
-- `main.py`: Aplicación Flask principal
-- `db.py`: Configuración de la base de datos
-- `templates/index.html`: Plantilla HTML
-- `static/css/style.css`: Estilos CSS
-- `static/js/script.js`: JavaScript para interactividad
-- `requirements.txt`: Dependencias de Python
+```bash
+python3 app.py
+cd frontend && npm run dev
+```
 
-## Solución de Problemas
+## Estructura
 
-- Si hay errores al ejecutar, asegúrate de tener Flask instalado.
-- La base de datos se crea automáticamente al ejecutar la aplicación.
+- app/: backend Flask modular
+- frontend/: frontend React + Vite
+- data/: base de datos y recursos
+- scripts/: scripts de instalación y ejecución

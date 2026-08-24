@@ -1,0 +1,671 @@
+{% extends "base.html" %}
+{% block title %}{{ activity.name }} — Discourse Lab{% endblock %}
+
+{% block content %}
+<div class="dl-detail-page">
+  <div class="dl-detail-header dl-reveal">
+    <a class="dl-btn dl-btn-ghost" href="{{ url_for('main.level_detail', level_id=activity.level_id) }}" style="margin-bottom:var(--dl-space-4)">← Volver al nivel</a>
+    <p class="dl-eyebrow">Actividad interactiva</p>
+    <h1>{{ activity.name }}</h1>
+    <p class="dl-muted" style="font-size:var(--dl-text-lg);margin-top:var(--dl-space-3);max-width:680px">{{ activity.summary }}</p>
+  </div>
+
+  <div class="dl-card dl-reveal" style="margin-bottom:var(--dl-space-6)">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--dl-space-4)">
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Objetivo</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{{ activity.objective }}</strong>
+      </div>
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Instrucciones</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{{ activity.instructions }}</strong>
+      </div>
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">XP disponible</span>
+        <strong style="display:block;font-size:var(--dl-text-sm);color:var(--dl-amber)">+{{ activity.xp_reward }} XP</strong>
+      </div>
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Progreso</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{{ progress.completed and 'Completada' or 'Pendiente' }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="dl-card dl-reveal" id="activityStage">
+    <div class="dl-activity-toolbar" style="display:flex;justify-content:space-between;align-items:center;gap:var(--dl-space-3)">
+      <div>
+        <span class="dl-eyebrow">Motor de actividades</span>
+        <div class="dl-mono" id="activityTimer">Tiempo: 00:00</div>
+      </div>
+      <div style="display:flex;gap:var(--dl-space-3)">
+        <button class="dl-btn dl-btn-secondary" id="showHint">Mostrar pista</button>
+        <button class="dl-btn dl-btn-secondary" id="resetActivity">Reintentar</button>
+      </div>
+    </div>
+
+    <div id="activityCanvas" style="margin-top:var(--dl-space-5)"></div>
+
+    <div class="dl-feedback" id="activityFeedback" style="margin-top:var(--dl-space-5);display:none;"></div>
+
+    <div style="display:flex;justify-content:flex-end;gap:var(--dl-space-3);margin-top:var(--dl-space-5)">
+      <button class="dl-btn dl-btn-ghost" id="helpButton">Ayuda</button>
+      <button class="dl-btn dl-btn-primary" id="evaluateActivity">Enviar respuesta</button>
+    </div>
+  </div>
+
+  <div class="dl-card dl-reveal" style="margin-top:var(--dl-space-6)">
+    <p class="dl-eyebrow">Resumen del nivel</p>
+    <div class="dl-progress-track" style="height:10px;margin-top:var(--dl-space-3)">
+      <div class="dl-progress-fill" id="levelProgressFill" data-progress="{{ level_overview.progress }}"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--dl-space-4)">
+      <span class="dl-muted" style="font-size:var(--dl-text-xs)">Avance del módulo</span>
+      <strong>{{ level_overview.progress }}%</strong>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="application/json" id="activity-data">{{ activity | tojson | safe }}</script>
+<script type="application/json" id="progress-data">{{ progress | tojson | safe }}</script>
+<script type="application/json" id="next-activity-data">{{ next_activity | tojson | safe }}</script>
+<script>
+  const activity = JSON.parse(document.getElementById('activity-data').textContent || '{}');
+  const activityProgress = JSON.parse(document.getElementById('progress-data').textContent || '{}');
+  const nextActivity = JSON.parse(document.getElementById('next-activity-data').textContent || 'null');
+  const payload = activity.payload || {};
+
+  const levelProgressFill = document.getElementById('levelProgressFill');
+  if (levelProgressFill) {
+    const progressValue = Number(levelProgressFill.dataset.progress || 0);
+    levelProgressFill.style.width = `${progressValue}%`;
+  }
+  let timerInterval = null;
+  let secondsElapsed = 0;
+  let hintsUsed = activityProgress.hints_used || 0;
+  let isSubmitting = false;
+
+  const state = {
+    selected: [],
+    order: [],
+    assignments: {},
+    choice: null,
+    selectedOrderBlock: null,
+    answer: '',
+  };
+
+  function normalizeActivityType(type) {
+    const raw = String(type || 'written').trim().toLowerCase();
+    if (!raw) return 'written';
+    if (raw.includes('drag') && raw.includes('drop')) return 'drag_drop';
+    if (raw.includes('clas')) return 'classification';
+    if (raw.includes('orden') || raw === 'order') return 'order';
+    if (raw.includes('match') || raw.includes('parej')) return 'matching';
+    if (raw.includes('simul')) return 'simulation';
+    if (raw.includes('hot')) return 'hotspot';
+    if (raw.includes('infer')) return 'inference';
+    if (raw.includes('error')) return 'error_spot';
+    if (raw.includes('decis')) return 'decision';
+    if (raw.includes('choice') || raw.includes('select') || raw.includes('option') || raw.includes('concept')) return 'concept_choice';
+    if (raw.includes('escrib') || raw === 'written') return 'written';
+    return raw;
+  }
+
+  function formatTime(sec) {
+    const minutes = String(Math.floor(sec / 60)).padStart(2, '0');
+    const seconds = String(sec % 60).padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    const timerEl = document.getElementById('activityTimer');
+    timerInterval = setInterval(() => {
+      secondsElapsed += 1;
+      timerEl.textContent = `Tiempo: ${formatTime(secondsElapsed)}`;
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+  }
+
+  function showHelp() {
+    const guides = {
+      hotspot: 'Lee cada opción y selecciona únicamente las que cumplen la condición del enunciado. Por ejemplo, si una palabra enfatiza la acción principal, compárala con el objetivo antes de marcarla.',
+      drag_drop: 'Organiza los bloques de izquierda a derecha según cómo se comunicaría primero el contexto, después la acción y al final el resultado. Haz clic en un bloque y luego en otro para intercambiarlos, o arrástralo sobre otro bloque.',
+      order: 'Busca una secuencia lógica: presentación de la idea, desarrollo y cierre. Haz clic en dos bloques para intercambiarlos o arrástralos hasta la posición correcta.',
+      matching: 'Relaciona cada concepto con la definición que describe su función, no solo con una palabra parecida. Revisa todas las listas antes de enviar.',
+    };
+    const guidance = guides[activity.activity_type] || 'Lee el objetivo y las instrucciones. Identifica qué información pide la actividad, prueba una alternativa y usa la pista si necesitas una orientación adicional.';
+    const feedbackEl = document.getElementById('activityFeedback');
+    feedbackEl.style.display = 'block';
+    feedbackEl.innerHTML = `<div class="dl-card"><strong>Guía de la actividad</strong><p>${guidance}</p><p><strong>Objetivo:</strong> ${activity.objective}</p><p>No muestra la respuesta: úsala para orientar tu siguiente intento.</p></div>`;
+  }
+
+  function createButton(text, onClick, extraClass = '') {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `dl-btn dl-btn-sm ${extraClass}`;
+    button.textContent = text;
+    button.addEventListener('click', onClick);
+    return button;
+  }
+
+  function renderHotspot() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Selecciona las opciones que consideres correctas.</p>';
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(auto-fit,minmax(180px,1fr))';
+    grid.style.gap = '1rem';
+    payload.items?.forEach((item, index) => {
+      const tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'dl-chip';
+      tile.textContent = item.text;
+      tile.dataset.index = index;
+      tile.addEventListener('click', () => {
+        const idx = Number(tile.dataset.index);
+        if (state.selected.includes(idx)) {
+          state.selected = state.selected.filter((i) => i !== idx);
+          tile.classList.remove('active');
+        } else {
+          state.selected.push(idx);
+          tile.classList.add('active');
+        }
+      });
+      grid.appendChild(tile);
+    });
+    canvas.appendChild(grid);
+  }
+
+  function renderOrder() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Haz clic en dos bloques para intercambiarlos, o arrástralos hasta colocar el mensaje en el orden correcto.</p>';
+    const list = document.createElement('div');
+    list.id = 'orderList';
+    list.style.display = 'grid';
+    list.style.rowGap = '0.75rem';
+    const items = payload.items || payload.blocks || [];
+    items.forEach((item) => {
+      const block = document.createElement('div');
+      block.className = 'dl-card';
+      block.draggable = true;
+      block.tabIndex = 0;
+      block.setAttribute('role', 'button');
+      block.setAttribute('aria-label', `Bloque: ${item.text}. Selecciona otro bloque para intercambiar su posición.`);
+      block.dataset.id = item.id;
+      block.textContent = item.text;
+      block.style.cursor = 'grab';
+      block.style.padding = '1rem';
+      const selectOrSwap = () => {
+        const active = state.selectedOrderBlock;
+        if (!active) {
+          state.selectedOrderBlock = block;
+          block.classList.add('active');
+          block.setAttribute('aria-pressed', 'true');
+          return;
+        }
+        if (active === block) {
+          block.classList.remove('active');
+          block.setAttribute('aria-pressed', 'false');
+          state.selectedOrderBlock = null;
+          return;
+        }
+        const parent = block.parentNode;
+        const activeNext = active.nextSibling;
+        const blockNext = block.nextSibling;
+        if (activeNext === block) parent.insertBefore(block, active);
+        else if (blockNext === active) parent.insertBefore(active, block);
+        else {
+          parent.insertBefore(active, blockNext);
+          parent.insertBefore(block, activeNext);
+        }
+        active.classList.remove('active');
+        active.setAttribute('aria-pressed', 'false');
+        state.selectedOrderBlock = null;
+      };
+      block.addEventListener('click', selectOrSwap);
+      block.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectOrSwap();
+        }
+      });
+      block.addEventListener('dragstart', (e) => {
+        state.selectedOrderBlock?.classList.remove('active');
+        state.selectedOrderBlock = null;
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+      block.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        block.classList.add('drag-over');
+      });
+      block.addEventListener('dragleave', () => {
+        block.classList.remove('drag-over');
+      });
+      block.addEventListener('drop', (e) => {
+        e.preventDefault();
+        block.classList.remove('drag-over');
+        const draggedId = e.dataTransfer.getData('text/plain');
+        const draggedBlock = document.querySelector(`[data-id='${draggedId}']`);
+        if (draggedBlock && draggedBlock !== block) {
+          const parent = block.parentNode;
+          parent.insertBefore(draggedBlock, block.nextSibling);
+        }
+      });
+      list.appendChild(block);
+    });
+    canvas.appendChild(list);
+  }
+
+  function renderMatching() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Relaciona cada elemento con su pareja correcta.</p>';
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = '1fr 1fr';
+    grid.style.gap = '1rem';
+
+    const left = document.createElement('div');
+    const right = document.createElement('div');
+    left.innerHTML = '<strong>Concepto</strong>';
+    right.innerHTML = '<strong>Definición</strong>';
+
+    payload.pairs?.forEach((pair, index) => {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.justifyContent = 'space-between';
+      row.style.marginBottom = '0.75rem';
+      const label = document.createElement('span');
+      label.textContent = pair.left;
+      const select = document.createElement('select');
+      select.style.minWidth = '180px';
+      select.innerHTML = '<option value="">Selecciona</option>' + payload.pairs.map((option) => `<option value="${option.right}">${option.right}</option>`).join('');
+      select.addEventListener('change', () => {
+        state.assignments[pair.left] = select.value;
+      });
+      row.appendChild(label);
+      row.appendChild(select);
+      canvas.appendChild(row);
+    });
+  }
+
+  function renderClassification() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Clasifica cada término en la categoría correcta.</p>';
+    const container = document.createElement('div');
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'minmax(0, 1.4fr) minmax(220px, 420px)';
+    container.style.gap = '0.9rem 1.5rem';
+    container.style.alignItems = 'center';
+    container.style.maxWidth = '980px';
+    container.style.margin = '0 auto';
+
+    payload.items?.forEach((item) => {
+      const label = document.createElement('span');
+      label.textContent = item.text;
+      label.style.fontSize = '1.05rem';
+      label.style.lineHeight = '1.5';
+      label.style.fontWeight = '500';
+      label.style.color = '#edf6ff';
+      label.style.paddingRight = '1rem';
+      label.style.textAlign = 'left';
+      label.style.wordBreak = 'break-word';
+
+      const select = document.createElement('select');
+      select.style.width = '100%';
+      select.style.minHeight = '52px';
+      select.style.height = '52px';
+      select.style.borderRadius = '0.9rem';
+      select.style.border = '1px solid rgba(255,255,255,0.18)';
+      select.style.background = 'rgba(255,255,255,0.04)';
+      select.style.color = '#eef6ff';
+      select.style.padding = '0 1rem';
+      select.style.outline = 'none';
+      select.innerHTML = '<option value="">Categoriza</option>' + payload.categories.map((option) => `<option value="${option.id}">${option.label}</option>`).join('');
+      select.addEventListener('change', () => {
+        state.assignments[item.id] = select.value;
+      });
+
+      container.appendChild(label);
+      container.appendChild(select);
+    });
+    canvas.appendChild(container);
+  }
+
+  function renderSimulation() {
+    const blocks = payload.blocks || payload.items || [];
+    const expected = payload.correct_order || [];
+    if (expected.length === blocks.length) {
+      renderOrder();
+      return;
+    }
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Selecciona los bloques que forman la respuesta profesional adecuada.</p>';
+    blocks.forEach((block) => {
+      const button = createButton(block.text, () => {
+        if (state.selected.includes(block.id)) {
+          state.selected = state.selected.filter((id) => id !== block.id);
+          button.classList.remove('active');
+        } else {
+          state.selected.push(block.id);
+          button.classList.add('active');
+        }
+      }, 'dl-simulation-choice');
+      button.dataset.id = block.id;
+      canvas.appendChild(button);
+    });
+  }
+
+  function renderDecision() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Asigna a cada afirmación el nivel de certeza que expresa.</p>';
+    const options = [
+      { id: 'verde', label: 'Seguro' },
+      { id: 'amarillo', label: 'Probable' },
+      { id: 'rojo', label: 'Incierto' },
+    ];
+    payload.items?.forEach((item) => {
+      const row = document.createElement('div');
+      row.className = 'dl-decision-row';
+      const label = document.createElement('span');
+      label.textContent = item.text;
+      const select = document.createElement('select');
+      select.innerHTML = '<option value="">Selecciona un nivel</option>' + options.map((option) => `<option value="${option.id}">${option.label}</option>`).join('');
+      select.addEventListener('change', () => { state.assignments[item.id] = select.value; });
+      row.append(label, select);
+      canvas.appendChild(row);
+    });
+  }
+
+  function renderInference() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Elige la interpretación más acertada.</p>';
+    payload.items?.forEach((item) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'dl-card';
+      card.textContent = item.text;
+      card.style.textAlign = 'left';
+      card.style.width = '100%';
+      card.dataset.id = item.id;
+      card.addEventListener('click', () => {
+        state.choice = item.id;
+        document.querySelectorAll('#activityCanvas .dl-card').forEach((el) => el.classList.remove('active'));
+        card.classList.add('active');
+      });
+      canvas.appendChild(card);
+    });
+  }
+
+  function renderConceptChoice() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Selecciona la opción que explica mejor el concepto.</p>';
+    payload.items?.forEach((item) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'dl-card';
+      card.textContent = item.text;
+      card.style.textAlign = 'left';
+      card.style.width = '100%';
+      card.dataset.id = item.id;
+      card.addEventListener('click', () => {
+        state.choice = item.id;
+        document.querySelectorAll('#activityCanvas .dl-card').forEach((el) => el.classList.remove('active'));
+        card.classList.add('active');
+      });
+      canvas.appendChild(card);
+    });
+  }
+
+  function renderErrorSpot() {
+    const canvas = document.getElementById('activityCanvas');
+    canvas.innerHTML = '<p class="dl-muted">Selecciona la frase que mejor representa el mensaje correcto.</p>';
+    payload.items?.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'dl-chip';
+      button.textContent = item.text;
+      button.dataset.index = index;
+      button.addEventListener('click', () => {
+        state.selected = [Number(button.dataset.index)];
+        document.querySelectorAll('#activityCanvas .dl-chip').forEach((chip) => chip.classList.remove('active'));
+        button.classList.add('active');
+      });
+      canvas.appendChild(button);
+    });
+  }
+
+  function renderWritten() {
+    const canvas = document.getElementById('activityCanvas');
+    const promptText = activity?.instructions || 'Escribe una palabra o una frase breve.';
+    canvas.innerHTML = `<p class="dl-muted">${promptText}</p><p class="dl-muted" style="margin-top:0.5rem; font-size:0.9rem;">No hace falta redactar un texto largo: basta con una palabra, una frase corta o una idea breve.</p>`;
+    const textarea = document.createElement('textarea');
+    textarea.rows = 4;
+    textarea.value = state.answer || '';
+    textarea.placeholder = 'Escribe una palabra o una frase breve...';
+    textarea.style.width = '100%';
+    textarea.style.minHeight = '120px';
+    textarea.style.resize = 'vertical';
+    textarea.style.padding = '1rem';
+    textarea.style.borderRadius = '0.9rem';
+    textarea.style.border = '1px solid rgba(255,255,255,0.14)';
+    textarea.style.background = 'rgba(255,255,255,0.04)';
+    textarea.style.color = '#eef6ff';
+    textarea.addEventListener('input', (event) => {
+      state.answer = event.target.value.trim();
+    });
+    canvas.appendChild(textarea);
+    if (payload.answer && typeof payload.answer === 'string') {
+      const note = document.createElement('p');
+      note.className = 'dl-muted';
+      note.style.marginTop = '0.9rem';
+      note.textContent = 'La respuesta correcta se evaluará con criterio de la actividad y la explicación del enunciado.';
+      canvas.appendChild(note);
+    }
+  }
+
+  function renderDefault() {
+    const canvas = document.getElementById('activityCanvas');
+    const normalizedType = normalizeActivityType(activity.activity_type);
+    canvas.innerHTML = `<p class="dl-muted">La actividad con tipo "${normalizedType}" no tiene una vista especial, pero sigue disponible para responder.</p>`;
+  }
+
+  function renderActivity() {
+    const normalizedType = normalizeActivityType(activity.activity_type);
+    switch (normalizedType) {
+      case 'hotspot':
+        renderHotspot();
+        break;
+      case 'order':
+      case 'sentence_editor':
+      case 'drag_drop':
+        renderOrder();
+        break;
+      case 'simulation':
+        renderSimulation();
+        break;
+      case 'matching':
+        renderMatching();
+        break;
+      case 'classification':
+        renderClassification();
+        break;
+      case 'inference':
+        renderInference();
+        break;
+      case 'error_spot':
+        renderErrorSpot();
+        break;
+      case 'decision':
+        renderDecision();
+        break;
+      case 'concept_choice':
+        renderConceptChoice();
+        break;
+      case 'written':
+        renderWritten();
+        break;
+      default:
+        renderDefault();
+        break;
+    }
+  }
+
+  function evaluateActivity() {
+    let correct = 0;
+    let incorrect = 0;
+    let completed = false;
+    const feedback = [];
+
+    const normalizedType = normalizeActivityType(activity.activity_type);
+
+    if (normalizedType === 'hotspot') {
+      const correctIds = payload.items.filter((item) => item.correct).map((item, index) => index);
+      const selected = state.selected.slice().sort((a, b) => a - b);
+      const expected = correctIds.slice().sort((a, b) => a - b);
+      correct = selected.filter((id) => expected.includes(id)).length;
+      incorrect = selected.length - correct + expected.filter((id) => !selected.includes(id)).length;
+      completed = correct === expected.length && incorrect === 0;
+      feedback.push(completed ? 'Excelente. Has identificado las palabras clave.' : 'Revisa las selecciones y vuelve a intentarlo.');
+    } else if (['order', 'sentence_editor', 'drag_drop'].includes(normalizedType) || (normalizedType === 'simulation' && (payload.correct_order || []).length === (payload.blocks || payload.items || []).length)) {
+      const items = Array.from(document.querySelectorAll('#orderList [data-id]'));
+      const order = items.map((item) => item.dataset.id);
+      const expected = payload.correct_order || payload.items?.map((item) => item.id) || [];
+      correct = order.filter((id, index) => expected[index] === id).length;
+      incorrect = order.length - correct;
+      completed = expected.length > 0 && correct === expected.length;
+      feedback.push(completed ? 'Muy bien. El discurso está ordenado correctamente.' : 'Ajusta algunos bloques y vuelve a intentarlo para mejorar la coherencia.');
+    } else if (normalizedType === 'simulation') {
+      const expected = payload.correct_order || [];
+      const selected = state.selected.slice().sort();
+      const required = expected.slice().sort();
+      correct = selected.filter((id) => required.includes(id)).length;
+      incorrect = selected.length - correct + required.filter((id) => !selected.includes(id)).length;
+      completed = correct === required.length && incorrect === 0;
+      feedback.push(completed ? 'Has elegido una respuesta profesional y completa.' : 'Revisa qué bloques aportan claridad, empatía y una acción concreta.');
+    } else if (normalizedType === 'matching') {
+      const expected = payload.pairs.reduce((acc, item) => ({ ...acc, [item.left]: item.right }), {});
+      let total = payload.pairs.length;
+      correct = payload.pairs.filter((item) => state.assignments[item.left] === item.right).length;
+      incorrect = total - correct;
+      completed = correct === total;
+      feedback.push(completed ? 'Has emparejado correctamente cada concepto.' : 'Algunas relaciones no coinciden, revisa las definiciones.');
+    } else if (normalizedType === 'classification') {
+      let total = payload.items.length;
+      correct = payload.items.filter((item) => state.assignments[item.id] === item.category).length;
+      incorrect = total - correct;
+      completed = correct === total;
+      feedback.push(completed ? 'Clasificación precisa. Muy bien.' : 'Hay categorías incorrectas. Fíjate en el rol de cada término.');
+    } else if (normalizedType === 'inference') {
+      const expected = payload.items.find((item) => item.correct)?.id;
+      correct = state.choice === expected ? 1 : 0;
+      incorrect = correct ? 0 : 1;
+      completed = correct === 1;
+      feedback.push(completed ? 'Interpretación acertada.' : 'Intenta leer el contexto con más cuidado.');
+    } else if (normalizedType === 'error_spot') {
+      const selectedIndex = state.selected[0];
+      const item = payload.items[selectedIndex];
+      correct = item && item.correct ? 1 : 0;
+      incorrect = item ? (correct ? 0 : 1) : 1;
+      completed = correct === 1;
+      feedback.push(completed ? 'Has localizado correctamente el segmento relevante.' : 'Busca el error en la concordancia o estructura.');
+    } else if (normalizedType === 'decision') {
+      const total = payload.items?.length || 0;
+      correct = payload.items?.filter((item) => state.assignments[item.id] === item.correct).length || 0;
+      incorrect = total - correct;
+      completed = total > 0 && correct === total;
+      feedback.push(completed ? 'Has distinguido correctamente todos los niveles de certeza.' : 'Revisa las expresiones que indican seguridad, posibilidad o duda.');
+    } else if (normalizedType === 'concept_choice') {
+      const expected = payload.items?.find((item) => item.correct)?.id;
+      correct = state.choice === expected ? 1 : 0;
+      incorrect = correct ? 0 : 1;
+      completed = correct === 1;
+      feedback.push(completed ? 'Excelente. Has elegido la opción correcta.' : 'Revisa la idea central y vuelve a intentarlo.');
+    } else if (normalizedType === 'written') {
+      const answer = (state.answer || '').trim();
+      const hasResponse = answer.length > 0;
+      correct = hasResponse ? 1 : 0;
+      incorrect = hasResponse ? 0 : 1;
+      completed = hasResponse;
+      feedback.push(completed ? 'Respuesta registrada. Revisa la explicación para reforzar tu criterio.' : 'Escribe una respuesta para poder continuar y guardar el progreso.');
+    } else {
+      feedback.push('Esta actividad necesita un motor de evaluación específico.');
+    }
+
+    const score = completed ? 100 : Math.max(0, Math.round((correct / Math.max(correct + incorrect, 1)) * 100));
+    const xp = completed ? activity.xp_reward : Math.round(activity.xp_reward * (correct / Math.max(payload.items?.length || 1, 1)));
+    submitResult({ completed, correct, incorrect, score, xp, hints_used: hintsUsed, feedback: feedback.join(' ') });
+  }
+
+  async function submitResult(result) {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    const submitButton = document.getElementById('evaluateActivity');
+    submitButton.disabled = true;
+    let data;
+    try {
+      const res = await fetch(`{{ url_for('main.activity_submit', slug=activity.slug) }}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(result),
+      });
+      data = await res.json();
+    } catch (error) {
+      data = { success: false, message: 'No se pudo conectar con el servidor.' };
+    } finally {
+      isSubmitting = false;
+      submitButton.disabled = false;
+    }
+    const feedbackEl = document.getElementById('activityFeedback');
+    feedbackEl.style.display = 'block';
+    if (data.success && result.completed) {
+      const levelProgress = data.level_overview?.progress ?? 0;
+      const nextAction = nextActivity
+        ? `<a class="dl-btn dl-btn-primary" href="/activities/${nextActivity.slug}">Siguiente actividad: ${nextActivity.name} →</a>`
+        : `<a class="dl-btn dl-btn-secondary" href="{{ url_for('main.level_detail', level_id=activity.level_id) }}">Volver al mapa del nivel</a>`;
+      feedbackEl.innerHTML = `<div class="dl-card"><strong>¡Misión completada!</strong><p>${result.feedback}</p><div class="dl-result-stats"><span>+${data.xp} XP</span><span>${data.coins} monedas</span><span>Nivel {{ session.get("student", {}).get("level", 1) }}</span><span>${levelProgress}% del nivel</span></div><p class="dl-muted">${nextActivity ? `Siguiente misión: ${nextActivity.name} · +${nextActivity.xp} XP` : 'Has terminado las actividades disponibles de este nivel.'}</p><div class="dl-result-actions">${nextAction}<button class="dl-btn dl-btn-ghost" type="button" id="repeatActivity">Repetir actividad</button></div></div>`;
+      feedbackEl.querySelector('#repeatActivity')?.addEventListener('click', () => document.getElementById('resetActivity').click());
+    } else {
+      feedbackEl.innerHTML = `<div class="dl-card"><strong>${data.success ? 'Revisa tu intento' : 'Error'}</strong><p>${result.feedback}</p><p>XP ganada: ${data.xp || 0}</p><button class="dl-btn dl-btn-secondary" type="button" id="repeatActivity">Reintentar</button></div>`;
+      feedbackEl.querySelector('#repeatActivity')?.addEventListener('click', () => document.getElementById('resetActivity').click());
+    }
+    if (data.success) {
+      DiscourseLab.showToast(result.completed ? 'Actividad completada' : 'Intento guardado', result.completed ? `+${data.xp} XP` : 'Revisa la retroalimentación y vuelve a intentarlo.', result.completed ? 'xp' : 'info');
+      if (result.completed && data.level_up) {
+        DiscourseLab.showLevelUp(data.level);
+      }
+    } else {
+      DiscourseLab.showToast('No se pudo guardar', data.message || 'Intenta nuevamente', 'danger');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderActivity();
+    startTimer();
+    document.getElementById('showHint').addEventListener('click', () => {
+      hintsUsed += 1;
+      const hint = payload.hint || 'La pista está en el enunciado y el tono profesional.';
+      DiscourseLab.showToast('Pista', hint, 'info');
+    });
+    document.getElementById('resetActivity').addEventListener('click', () => {
+      state.selected = [];
+      state.order = [];
+      state.assignments = {};
+      state.choice = null;
+      state.selectedOrderBlock = null;
+      state.answer = '';
+      secondsElapsed = 0;
+      document.getElementById('activityTimer').textContent = 'Tiempo: 00:00';
+      document.getElementById('activityFeedback').style.display = 'none';
+      renderActivity();
+    });
+    document.getElementById('helpButton').addEventListener('click', showHelp);
+    document.getElementById('evaluateActivity').addEventListener('click', evaluateActivity);
+  });
+</script>
+{% endblock %}

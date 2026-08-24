@@ -1,0 +1,1066 @@
+{
+  "blocks": [
+    {
+      "level_id": 1,
+      "name": "Fonética y Fonología",
+      "source": "Gramática Lengua Española — Larousse — Munguía Zatarain, Munguía Zatarain y Rocha Romero.",
+      "description": "Bloque basado en contenidos del libro indicado. Contiene ejercicios sobre articulación, acento, transcripción y fonología.",
+      "exercises": [
+        {
+          "number": 1,
+          "title": "Punto de articulación inicial",
+          "enunciado": "Clasifica las siguientes palabras según el punto de articulación de su consonante inicial: pan, foca, tener, kilo, mesa, yeso, gato, ala, chorizo, ratón.",
+          "type": "classification",
+          "difficulty": 2,
+          "answer": {
+            "bilabial": [
+              "pan",
+              "mesa"
+            ],
+            "labiodental": [
+              "foca"
+            ],
+            "alveolar": [
+              "tener",
+              "ratón"
+            ],
+            "velar": [
+              "kilo",
+              "gato"
+            ],
+            "palatal": [
+              "chorizo",
+              "yeso"
+            ],
+            "vowel_initial": [
+              "ala"
+            ]
+          },
+          "explanation": "Clasificación por lugar de articulación: bilabial (p, m), labiodental (f), alveolar (t, r), velar (k, g), palatal (ch, y approximant), y vocal inicial para 'ala'.",
+          "source": "Larousse"
+        },
+        {
+          "number": 2,
+          "title": "Sonido y fonema: la /n/",
+          "enunciado": "Lee estas palabras: nada, invierno y angosto. ¿Qué opción explica mejor la diferencia entre sonido y fonema?",
+          "type": "concept_choice",
+          "difficulty": 1,
+          "answer": "El fonema es la unidad general; el sonido es la forma concreta en que se pronuncia según el contexto.",
+          "explanation": "La misma letra puede producir sonidos distintos dependiendo de la palabra. El fonema es la idea general; el sonido es la realización concreta que escuchamos.",
+          "source": "Larousse",
+          "payload": {
+            "hint": "Piensa en la idea general y en la forma concreta de pronunciar la /n/ en cada palabra.",
+            "items": [
+              {"id": "a", "text": "El sonido es la unidad general y el fonema es la forma concreta en que se pronuncia.", "correct": false},
+              {"id": "b", "text": "El fonema es la idea general; el sonido es la forma concreta en que se pronuncia según la palabra.", "correct": true},
+              {"id": "c", "text": "El fonema es solo la letra escrita y el sonido no cambia nunca.", "correct": false},
+              {"id": "d", "text": "Sonido y fonema son lo mismo en todas las palabras.", "correct": false}
+            ]
+          }
+        },
+        {
+          "number": 3,
+          "title": "Transcripción fonológica",
+          "enunciado": "¿Cuál de estas opciones representa mejor la forma de transcribir fonológicamente las palabras casa, cebra, joroba, llama y chorizo?",
+          "type": "concept_choice",
+          "difficulty": 1,
+          "answer": "La opción correcta simplifica la transcripción con barras y muestra que la pronunciación puede variar según la variedad dialectal.",
+          "explanation": "La transcripción fonológica no exige escribir una respuesta literal en un largo texto; se trata de reconocer la representación más adecuada del sonido según la palabra y la variedad.",
+          "source": "Larousse",
+          "payload": {
+            "hint": "Busca la opción que presenta la transcripción fonológica más clara y tradicional, sin requerir una respuesta escrita extensa.",
+            "items": [
+              {"id": "a", "text": "/kasa/ /seβɾa/ /xoɾoba/ /ʝama/ /tʃoɾiso/", "correct": true},
+              {"id": "b", "text": "/ka.sa/ /seβɾa/ /xoɾoβa/ /ʝama/ /tʃoɾi.so/", "correct": false},
+              {"id": "c", "text": "/kasa/ /ceβɾa/ /joroba/ /llama/ /chorizo/", "correct": false},
+              {"id": "d", "text": "/kasa/ /seβɾa/ /xoɾoba/ /ya.ma/ /tʃoriθo/", "correct": false}
+            ]
+          }
+        },
+        {
+          "number": 4,
+          "title": "Sordas o sonoras",
+          "enunciado": "Indica si las siguientes consonantes son sordas o sonoras: /p/, /b/, /t/, /d/, /k/, /g/, /f/, /s/.",
+          "type": "classification",
+          "difficulty": 1,
+          "answer": {
+            "sordas": [
+              "/p/",
+              "/t/",
+              "/k/",
+              "/f/",
+              "/s/"
+            ],
+            "sonoras": [
+              "/b/",
+              "/d/",
+              "/g/"
+            ]
+          },
+          "explanation": "Las sordas no vibran las cuerdas vocales; las sonoras sí lo hacen (b, d, g).",
+          "source": "Larousse"
+        },
+        {
+          "number": 5,
+          "title": "Diptongo, hiato o triptongo",
+          "enunciado": "Separa en sílabas y señala si hay diptongo, hiato o triptongo: huerto, cielo, Latinoamérica, buey, sentenciáis.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": {
+            "huerto": "huer-to (diptongo: ue)",
+            "cielo": "cie-lo (diptongo: ie)",
+            "Latinoamérica": "La-ti-no-a-mé-ri-ca (hiato entre o y a)",
+            "buey": "buey (triptongo: buey en realidad se considera diptongo+consonante según análisis, pero se suele tratar como triptongo en pronunciación)",
+            "sentenciáis": "sen-ten-ciáis (diptongo: aí? en muchos casos es hiato dependiendo de acento — 'áis' marca hiato con tilde)"
+          },
+          "explanation": "Separación silábica y reconocimiento de diptongo/hiato; las realizaciones pueden variar según reglas de acentuación.",
+          "source": "Larousse"
+        },
+        {
+          "number": 6,
+          "title": "Lugar del acento",
+          "enunciado": "Clasifica las siguientes palabras según el lugar del acento (agudas, graves, esdrújulas, sobresdrújulas): salvar, árbol, cámara, dígaselo, café, azúcar, huésped.",
+          "type": "classification",
+          "difficulty": 2,
+          "answer": {
+            "agudas": [
+              "salvar",
+              "café"
+            ],
+            "graves": [
+              "árbol",
+              "azúcar",
+              "huésped"
+            ],
+            "esdrújulas": [
+              "cámara"
+            ],
+            "sobresdrújulas": [
+              "dígaselo"
+            ]
+          },
+          "explanation": "Clasificación según posición del acento y reglas de acentuación gráfica.",
+          "source": "Larousse"
+        },
+        {
+          "number": 7,
+          "title": "Acento en pizarrón y cama",
+          "enunciado": "Explica por qué las palabras pizarrón y cama llevan el acento en sílabas distintas y qué tipo de acento tiene cada una (ortográfico o prosódico).",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "'Pizarrón' es aguda y lleva tilde ortográfica en la última sílaba por terminar en consonante distinta de n/s; 'cama' es grave (llana) y no lleva tilde porque termina en vocal; su acento es prosódico (no marcado gráficamente).",
+          "explanation": "Distinción entre acento ortográfico (tilde) y acento prosódico (pronunciación).",
+          "source": "Larousse"
+        },
+        {
+          "number": 8,
+          "title": "Colocar tilde",
+          "enunciado": "Coloca tilde donde corresponda y explica la regla que aplicaste: facil, cortesmente, rapidamente, biceps, maiz.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": {
+            "corrected": [
+              "fácil",
+              "cortésmente",
+              "rápidamente",
+              "bíceps",
+              "maíz"
+            ]
+          },
+          "explanation": "Aplicación de reglas de acentuación: hiatos y palabras esdrújulas/llanas/agudas según terminación y sílaba tónica.",
+          "source": "Larousse"
+        },
+        {
+          "number": 9,
+          "title": "Acento diacrítico",
+          "enunciado": "Diferencia el uso del acento diacrítico en los siguientes pares y redacta una oración con cada palabra: tu/tú, el/él, si/sí, mas/más.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": {
+            "tu_tu": "tu (posesivo): Tu libro está aquí. / tú (pronombre): Tú sabes la respuesta.",
+            "el_el": "el (artículo): El coche es rojo. / él (pronombre): Él llegó tarde.",
+            "si_si": "si (condicional): Si vienes, avísame. / sí (afirmación): Sí, iré.",
+            "mas_mas": "mas (conjunción adversativa, poco usado): Quisiera ir, mas no puedo. / más (cantidad): Quiero más café."
+          },
+          "explanation": "Uso del acento diacrítico para distinguir palabras homógrafas con funciones distintas.",
+          "source": "Larousse"
+        },
+        {
+          "number": 10,
+          "title": "Acento enfático con qué y cómo",
+          "enunciado": "Observa estas frases: “¡Qué sorpresa!”, “¿Cómo lo hiciste?”, “Me dijo que vendría”. ¿Cuál de estas palabras lleva tilde por énfasis? Explica con tus palabras y escribe dos ejemplos cortos.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "La tilde se usa cuando la palabra expresa emoción, sorpresa o pregunta: '¡Qué sorpresa!' y '¿Cómo lo hiciste?'. En cambio, 'que' y 'como' se usan sin tilde cuando funcionan como conectores o comparaciones.",
+          "explanation": "La tilde enfática ayuda a resaltar la intención del hablante. No cambia la función básica de la palabra, pero sí marca una emoción o una pregunta con fuerza.",
+          "source": "Larousse"
+        },
+        {
+          "number": 11,
+          "title": "Letras silenciosas",
+          "enunciado": "Identifica cuáles de las siguientes letras no representan ningún sonido en ciertos contextos y explica por qué: h, u (después de q), u (después de g ante e, i).",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "La 'h' es muda en español actual; la 'u' después de 'q' no se pronuncia (que, qui) excepto con diéresis; la 'u' tras 'g' ante e/i suele no pronunciarse salvo con diéresis (güe, güi).",
+          "explanation": "Ortografía histórica y reglas de pronunciación: la diacrítica (diéresis) señala pronunciación de la 'u' cuando corresponde.",
+          "source": "Larousse"
+        },
+        {
+          "number": 12,
+          "title": "Fonética vs Fonología",
+          "enunciado": "Explica la diferencia entre fonética y fonología con tus propias palabras y da un ejemplo de cada disciplina.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "La fonética estudia los sonidos concretos y su producción (ejemplo: medir la frecuencia de [s] en una grabación). La fonología estudia las unidades abstractas (fonemas) y su función en el sistema (ejemplo: distinguir /s/ y /θ/ en diferentes dialectos).",
+          "explanation": "Ambas disciplinas se complementan: la fonética describe, la fonología explica funciones y contrastes.",
+          "source": "Larousse"
+        },
+        {
+          "number": 13,
+          "title": "Alófonos del fonema /b/",
+          "enunciado": "Da dos ejemplos de alófonos del fonema /b/ y explica en qué contexto aparece cada uno.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "[b] oclusiva al inicio de palabra o tras nasal (boca, un bebé -> [b]); [β] fricativa aproximante entre vocales (saber -> [sa'βer]).",
+          "explanation": "El fonema /b/ se realiza como oclusiva en posición fuerte y como aproximante entre vocales.",
+          "source": "Larousse"
+        },
+        {
+          "number": 14,
+          "title": "Vocales fuertes y débiles",
+          "enunciado": "Clasifica las siguientes vocales según su grado de abertura (fuertes o débiles): /a/, /e/, /i/, /o/, /u/.",
+          "type": "classification",
+          "difficulty": 1,
+          "answer": {
+            "fuertes": [
+              "/a/",
+              "/e/",
+              "/o/"
+            ],
+            "debiles": [
+              "/i/",
+              "/u/"
+            ]
+          },
+          "explanation": "Las vocales altas (i, u) se consideran débiles; las medias/bajas (a, e, o) fuertes.",
+          "source": "Larousse"
+        },
+        {
+          "number": 15,
+          "title": "Eliminación de ch y ll",
+          "enunciado": "Explica por qué en 1995 la Real Academia Española eliminó del alfabeto las letras ch y ll, y si esto significa que los sonidos que representaban desaparecieron.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "La RAE decidió unificar el orden alfabético para facilitar la colocación en diccionarios; ch y ll se consideraron dígrafos, no letras independientes. Los sonidos subsisten como secuencias fonológicas, por lo que no desaparecieron.",
+          "explanation": "La reforma afectó la consideración ortográfica como letras, no la pronunciación de sus sonidos.",
+          "source": "Larousse"
+        }
+      ]
+    },
+    {
+      "level_id": 2,
+      "name": "Morfología y formación de palabras",
+      "source": "Gramática Lengua Española — Larousse — Munguía Zatarain, Munguía Zatarain y Rocha Romero.",
+      "description": "Ejercicios para reconocer raíces, afijos, clases de palabras y procesos de derivación y composición.",
+      "exercises": [
+        {
+          "number": 1,
+          "title": "Raíz y afijo",
+          "enunciado": "Separa en raíz y afijos las palabras: desilusionar, prehistórico, inestable, nacionalidad.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "des-ilusion-ar = des- + ilusion + -ar; pre-histórico = pre- + histórico; in-estable = in- + estable; nacion-al-idad = nacion + -al + -idad.",
+          "explanation": "La raíz aporta el significado léxico principal; los afijos modifican el sentido o la categoría gramatical.",
+          "source": "Larousse"
+        },
+        {
+          "number": 2,
+          "title": "Prefijos y sufijos",
+          "enunciado": "Indica qué significado aporta el prefijo o sufijo en estas palabras: reabrir, humanizar, antiséptico, cartografía.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "re- = reiteración o repetición; -izar = convertir en; anti- = oposición; -grafía = descripción o escritura.",
+          "explanation": "Los prefijos cambian el significado base y los sufijos suelen modificar la categoría o la función.",
+          "source": "Larousse"
+        },
+        {
+          "number": 3,
+          "title": "Palabras primitivas y derivadas",
+          "enunciado": "Clasifica las siguientes palabras como primitivas o derivadas: árbol, arbolado, pan, panadería, niño, infantil.",
+          "type": "classification",
+          "difficulty": 1,
+          "answer": {
+            "primitivas": [
+              "árbol",
+              "pan",
+              "niño"
+            ],
+            "derivadas": [
+              "arbolado",
+              "panadería",
+              "infantil"
+            ]
+          },
+          "explanation": "Las palabras primitivas son base léxica; las derivadas se forman con afijos o composición.",
+          "source": "Larousse"
+        },
+        {
+          "number": 4,
+          "title": "Composición",
+          "enunciado": "Explica qué palabras son compuestas y por qué: paraguas, sacapuntas, portafolio, guardabosques.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "paraguas, sacapuntas, portafolio y guardabosques son compuestas porque resultan de la unión de dos o más elementos con significado unitario.",
+          "explanation": "La composición une lexemas para crear un término nuevo con significado específico.",
+          "source": "Larousse"
+        },
+        {
+          "number": 5,
+          "title": "Familia léxica",
+          "enunciado": "Escribe tres palabras de la familia léxica de “campo”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "campestre, campesino, acampar, campamento, campesinado.",
+          "explanation": "La familia léxica reúne palabras con la misma raíz semántica.",
+          "source": "Larousse"
+        },
+        {
+          "number": 6,
+          "title": "Sustantivos",
+          "enunciado": "Subraya los sustantivos en la frase: “La casa del maestro tenía varios libros y cuadernos sobre historia”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "casa, maestro, libros, cuadernos, historia.",
+          "explanation": "Los sustantivos nombran seres, objetos, ideas o acontecimientos.",
+          "source": "Larousse"
+        },
+        {
+          "number": 7,
+          "title": "Adjetivos calificativos",
+          "enunciado": "Escribe un adjetivo calificativo para cada sustantivo: río, estudiante, informe, mañana.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "río caudaloso; estudiante aplicado; informe claro; mañana tranquila.",
+          "explanation": "Los adjetivos describen cualidades o estados del sustantivo.",
+          "source": "Larousse"
+        },
+        {
+          "number": 8,
+          "title": "Verbos y tiempos",
+          "enunciado": "Conjuga en primera persona del singular del pretérito perfecto simple: correr, escribir, abrir.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "corrí, escribí, abrí.",
+          "explanation": "Las formas verbales marcan tiempo, modo, persona y número.",
+          "source": "Larousse"
+        },
+        {
+          "number": 9,
+          "title": "Género y número",
+          "enunciado": "Cambien al plural las siguientes palabras: lápiz, pared, crisis, reloj, mujer.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "lápices, paredes, crisis, relojes, mujeres.",
+          "explanation": "El número cambia el sustantivo cuando se refiere a varios elementos; algunos plurales presentan cambios ortográficos.",
+          "source": "Larousse"
+        },
+        {
+          "number": 10,
+          "title": "Lexemas y morfemas",
+          "enunciado": "Separa morfemas en estas palabras: estudiantes, amabilidad, imposible, internacional.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "estudiante + s; amable + dad; in + posible; inter + nacional.",
+          "explanation": "El lexema da el contenido principal; los morfemas añaden información gramatical o derivativa.",
+          "source": "Larousse"
+        },
+        {
+          "number": 11,
+          "title": "Palabras parasintéticas",
+          "enunciado": "Explica por qué “desalmado” es una palabra parasintética.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Porque combina un prefijo (des-) con un lexema que ya no funciona igual sin él, dando un significado nuevo de privación o ausencia.",
+          "explanation": "La parasíntesis combina derivación y prefijación para construir un término con sentido específico.",
+          "source": "Larousse"
+        },
+        {
+          "number": 12,
+          "title": "Determinantes",
+          "enunciado": "Indica qué determinantes aparecen en la frase: “Ese libro de mi hermano me resultó útil”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "ese, mi.",
+          "explanation": "Los determinantes acompañan al nombre aportando información de proximidad, posesión o cantidad.",
+          "source": "Larousse"
+        },
+        {
+          "number": 13,
+          "title": "Pronombres personales",
+          "enunciado": "Reescribe la frase reemplazando el sustantivo por pronombre: “María llamó a Andrés y Andrés respondió”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "María llamó a Andrés y él respondió.",
+          "explanation": "Los pronombres sustituyen al nombre y evitan repeticiones innecesarias.",
+          "source": "Larousse"
+        },
+        {
+          "number": 14,
+          "title": "Sinónimos y antónimos",
+          "enunciado": "Escribe un sinónimo y un antónimo de “claro”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Sinónimo: evidente, diáfano. Antónimo: oscuro, confuso.",
+          "explanation": "La sinonimia y antonimia son relaciones léxicas entre palabras.",
+          "source": "Larousse"
+        },
+        {
+          "number": 15,
+          "title": "Derivación y composición comparadas",
+          "enunciado": "Explica la diferencia entre una palabra derivada y una compuesta usando ejemplos.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Derivada se crea con afijos sobre una base: “panadería”; compuesta se forma por unión de dos palabras o lexemas: “sacapuntas”.",
+          "explanation": "La derivación agrega morfemas; la composición fusiona unidades léxicas.",
+          "source": "Larousse"
+        }
+      ]
+    },
+    {
+      "level_id": 3,
+      "name": "Sintaxis y estructura de la oración",
+      "source": "Gramática Lengua Española — Larousse — Munguía Zatarain, Munguía Zatarain y Rocha Romero.",
+      "description": "Reconocimiento de sujeto, predicado, complementos, concordancia, coordinación y subordinación.",
+      "exercises": [
+        {
+          "number": 1,
+          "title": "Sujeto y predicado",
+          "enunciado": "Separa sujeto y predicado en la oración: “Los estudiantes entregaron el trabajo a tiempo”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Sujeto: Los estudiantes. Predicado: entregaron el trabajo a tiempo.",
+          "explanation": "El sujeto realiza la acción y el predicado expresa lo que se dice de él.",
+          "source": "Larousse"
+        },
+        {
+          "number": 2,
+          "title": "Complemento directo",
+          "enunciado": "Identifica el complemento directo en: “El profesor corrigió los ejercicios”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "los ejercicios.",
+          "explanation": "El complemento directo recibe directamente la acción del verbo.",
+          "source": "Larousse"
+        },
+        {
+          "number": 3,
+          "title": "Complemento indirecto",
+          "enunciado": "Identifica el complemento indirecto en: “Envié un mensaje a mi hermano”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "a mi hermano.",
+          "explanation": "El complemento indirecto indica a quién o para quién se realiza la acción.",
+          "source": "Larousse"
+        },
+        {
+          "number": 4,
+          "title": "Circunstanciales",
+          "enunciado": "Señala la circunstancia en: “Hoy visitaremos el museo en la tarde”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Hoy (tiempo) y en la tarde (tiempo).",
+          "explanation": "Los circunstanciales aportan información sobre tiempo, lugar, modo, causa, finalidad, etc.",
+          "source": "Larousse"
+        },
+        {
+          "number": 5,
+          "title": "Concordancia nominal",
+          "enunciado": "Corrige la frase: “Las niñas estaba contentas”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Las niñas estaban contentas.",
+          "explanation": "El verbo debe concordar con el sujeto en número y persona.",
+          "source": "Larousse"
+        },
+        {
+          "number": 6,
+          "title": "Oración coordinada",
+          "enunciado": "Clasifica la oración: “Estudié mucho y aprobé el examen”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Coordinada copulativa.",
+          "explanation": "Las proposiciones coordinadas unen dos ideas con igualdad jerárquica.",
+          "source": "Larousse"
+        },
+        {
+          "number": 7,
+          "title": "Subordinada sustantiva",
+          "enunciado": "Identifica la subordinada en: “Deseo que vuelvas temprano”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "que vuelvas temprano.",
+          "explanation": "La subordinada sustantiva funciona como un nombre dentro de la oración principal.",
+          "source": "Larousse"
+        },
+        {
+          "number": 8,
+          "title": "Subordinada adverbial",
+          "enunciado": "Explica el valor de “cuando salieron” en: “Cuando salieron, cerré la puerta”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Es una subordinada adverbial de tiempo.",
+          "explanation": "Indica el momento en que se realiza la acción principal.",
+          "source": "Larousse"
+        },
+        {
+          "number": 9,
+          "title": "Oraciones yuxtapuestas",
+          "enunciado": "Determina si la oración es yuxtapuesta: “Llegué tarde; la reunión ya había comenzado”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Es yuxtapuesta, porque las dos proposiciones se unen sin nexo.",
+          "explanation": "La yuxtaposición vincula dos oraciones por pausa o puntuación.",
+          "source": "Larousse"
+        },
+        {
+          "number": 10,
+          "title": "Predicado nominal",
+          "enunciado": "En la oración “El profesor es muy paciente”, identifica el atributo.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "muy paciente.",
+          "explanation": "En el predicado nominal, el atributo caracteriza al sujeto con verbo copulativo.",
+          "source": "Larousse"
+        },
+        {
+          "number": 11,
+          "title": "Complemento agente",
+          "enunciado": "En “El examen fue aprobado por los alumnos”, identifica el complemento agente.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "por los alumnos.",
+          "explanation": "El complemento agente señala quién realiza la acción en la voz pasiva.",
+          "source": "Larousse"
+        },
+        {
+          "number": 12,
+          "title": "Concordancia verbal",
+          "enunciado": "Corrige: “La mayoría de los estudiantes fueron a la biblioteca”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "La mayoría de los estudiantes fue a la biblioteca.",
+          "explanation": "El núcleo del sujeto es “mayoría”, singular, por lo que el verbo va en singular.",
+          "source": "Larousse"
+        },
+        {
+          "number": 13,
+          "title": "Oración pasiva",
+          "enunciado": "Transforma a voz pasiva: “Los arquitectos diseñaron el museo”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "El museo fue diseñado por los arquitectos.",
+          "explanation": "La voz pasiva hace que el objeto pase a ser sujeto.",
+          "source": "Larousse"
+        },
+        {
+          "number": 14,
+          "title": "Proposición subordinada",
+          "enunciado": "Señala la subordinada en: “Aunque llueva, saldremos al parque”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Aunque llueva.",
+          "explanation": "Introduce una circunstancia que condiciona la acción principal.",
+          "source": "Larousse"
+        },
+        {
+          "number": 15,
+          "title": "Comprensión sintáctica",
+          "enunciado": "Explica qué función cumple “muy contento” en la oración: “Los alumnos volvieron muy contentos”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Es un atributo o complemento predicativo del sujeto, porque expresa el estado en que regresan los alumnos.",
+          "explanation": "El predicativo describe el sujeto o el complemento directo dentro del predicado.",
+          "source": "Larousse"
+        }
+      ]
+    },
+    {
+      "level_id": 4,
+      "name": "Semántica y pragmática",
+      "source": "elaboración propia",
+      "description": "Ejercicios para analizar significado, sentido contextual, inferencia y uso del lenguaje.",
+      "exercises": [
+        {
+          "number": 1,
+          "title": "Denotación y connotación",
+          "enunciado": "Explica la diferencia entre “el perro de la casa” y “es un perro” en un contexto figurado.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "La denotación describe un animal real; la connotación añade valor simbólico, como “es un perro” para referirse a alguien cobarde o servil.",
+          "explanation": "El mismo término puede tener primer significado literal y otro figurado según el contexto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 2,
+          "title": "Polisemia",
+          "enunciado": "Da dos significados de la palabra “banco”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Banco como entidad financiera y banco como asiento o zona de madera.",
+          "explanation": "La polisemia aparece cuando una palabra tiene varios significados relacionados.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 3,
+          "title": "Sinónimos",
+          "enunciado": "Escribe tres sinónimos de “alegría”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "felicidad, júbilo, regocijo.",
+          "explanation": "Los sinónimos comparten significado similar.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 4,
+          "title": "Antónimos",
+          "enunciado": "Escribe dos antónimos de “claro”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "oscuro, confuso.",
+          "explanation": "Los antónimos presentan significados opuestos.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 5,
+          "title": "Campo semántico",
+          "enunciado": "Escribe cinco palabras del campo semántico de la escuela.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "maestro, aula, libro, alumno, pizarra.",
+          "explanation": "Un campo semántico reúne palabras relacionadas por un significado común.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 6,
+          "title": "Hiperónimo e hipónimo",
+          "enunciado": "Relaciona: vehículo, coche, moto, tren.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Vehículo es hiperónimo; coche, moto y tren son hipónimos.",
+          "explanation": "El hiperónimo incluye a una categoría más general; los hipónimos son subtipos concretos.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 7,
+          "title": "Actos de habla",
+          "enunciado": "Clasifica estas frases según su acto de habla: “¿Puedes cerrar la puerta?”, “¡Cierra la puerta!”, “La puerta está cerrada”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Pregunta, imperativo y enunciado descriptivo.",
+          "explanation": "El acto de habla depende de la intención comunicativa del hablante.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 8,
+          "title": "Presuposición",
+          "enunciado": "Explica la presuposición en: “Juan volvió a Madrid”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Se presupone que Juan estuvo antes en Madrid.",
+          "explanation": "La presuposición añade información que se asume como cierta sin ser afirmada de forma directa.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 9,
+          "title": "Inferencia",
+          "enunciado": "Si un estudiante llega con el cuaderno mojado y en silencio, ¿qué inferencia puedes hacer?",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Probablemente ha tenido un problema o ha sufrido un percance en su camino.",
+          "explanation": "La inferencia deduce información implícita a partir del contexto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 10,
+          "title": "Ironía",
+          "enunciado": "Explica qué es la ironía en la frase: “Qué buen día para estudiar”, mientras llueve a cántaros.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Es una ironía porque el contenido literal contradice la situación real.",
+          "explanation": "La ironía transmite un sentido opuesto al literal para crear efecto expresivo.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 11,
+          "title": "Contexto",
+          "enunciado": "¿Cómo cambia el sentido de la palabra “banco” si hablamos de “banco del río” o de “banco de crédito”?",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "En el primer caso se refiere a una orilla; en el segundo a una institución financiera.",
+          "explanation": "El contexto resuelve la ambigüedad semántica.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 12,
+          "title": "Registro",
+          "enunciado": "Diferencia un registro formal e informal en la frase “Necesito ver al profesor” y “Tengo que hablar con el profe”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "La primera es formal y neutral; la segunda es informal y coloquial.",
+          "explanation": "El registro refleja la situación comunicativa y el nivel de formalidad.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 13,
+          "title": "Coherencia léxica",
+          "enunciado": "Explica por qué la frase “La mesa escuchó el problema” es incoherente.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Porque “mesa” no es un ser capaz de escuchar; falta coherencia semántica con el verbo.",
+          "explanation": "La coherencia exige que los significados encajen lógicamente en el contexto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 14,
+          "title": "Marcadores del discurso",
+          "enunciado": "Escribe dos conectores para añadir una consecuencia y dos para una oposición.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Consecuencia: por tanto, en consecuencia. Oposición: pero, sin embargo.",
+          "explanation": "Los conectores organizan la relación entre ideas.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 15,
+          "title": "Semántica de la afirmación",
+          "enunciado": "Explica la diferencia entre “No es posible” y “Es imposible”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Ambas expresan una imposibilidad, pero la segunda es más directa y enfática; la primera matiza la negación.",
+          "explanation": "La semántica de la oración depende de la estructura y del matiz expresivo.",
+          "source": "elaboración propia"
+        }
+      ]
+    },
+    {
+      "level_id": 5,
+      "name": "Discurso, coherencia y cohesión textual",
+      "source": "elaboración propia",
+      "description": "Análisis de párrafos, conectores, progresión temática, cohesión y estructura discursiva.",
+      "exercises": [
+        {
+          "number": 1,
+          "title": "Tema central",
+          "enunciado": "Lee este fragmento y escribe la idea principal: “El ruido ambiental afecta la concentración, aumenta el estrés y reduce la calidad del sueño. Por ello, las ciudades necesitan políticas de reducción de ruido”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "La idea principal es que el ruido urbano afecta la salud y exige medidas preventivas.",
+          "explanation": "La idea principal sintetiza el eje argumentativo del texto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 2,
+          "title": "Oración tópico",
+          "enunciado": "Escribe una oración tópico para un texto sobre la lectura en la adolescencia.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "La lectura en la adolescencia favorece el pensamiento crítico y la ampliación de vocabulario.",
+          "explanation": "La oración tópico presenta el tema general que se desarrollará en el texto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 3,
+          "title": "Cohesión por sustitución",
+          "enunciado": "Reescribe la frase evitando la repetición: “El informe llegó tarde. El informe causó retrasos”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "El informe llegó tarde y causó retrasos.",
+          "explanation": "La sustitución evita la repetición innecesaria y favorece la cohesión.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 4,
+          "title": "Conectores lógicos",
+          "enunciado": "Completa la frase con un conector apropiado: “El proyecto fue bien evaluado _______ tuvo varios ajustes previos”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "aunque.",
+          "explanation": "El conector marca contraste entre dos ideas.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 5,
+          "title": "Progresión temática",
+          "enunciado": "Explica qué significa que un texto tenga progresión temática constante.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Que el tema central se mantiene y se va desarrollando con información nueva pero relacionada.",
+          "explanation": "La progresión temática organiza la información sin perder el eje del discurso.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 6,
+          "title": "Coherencia argumentativa",
+          "enunciado": "Explica por qué la frase “La lluvia es útil; por eso, los agricultores la necesitan” es coherente.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Porque la segunda oración justifica la primera con una causa funcional.",
+          "explanation": "La coherencia argumentativa se basa en relaciones de causa, efecto o justificación.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 7,
+          "title": "Referencias anafóricas",
+          "enunciado": "Identifica la referencia anafórica en: “La ciudad estaba llena de transeúntes. Ellos caminaban rápido”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Ellos.",
+          "explanation": "La anáfora reemplaza un referente anterior para evitar repeticiones.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 8,
+          "title": "Resumen",
+          "enunciado": "Resume en dos líneas: “La biblioteca escolar abrió un taller de lectura para reforzar la comprensión de textos”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "La biblioteca escolar creó un taller de lectura para mejorar la comprensión de textos.",
+          "explanation": "El resumen conserva la idea principal y elimina detalles secundarios.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 9,
+          "title": "Texto expositivo",
+          "enunciado": "Escribe una oración de introducción para un texto expositivo sobre el cambio climático.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "El cambio climático es un fenómeno global que altera el equilibrio ecológico y afecta la vida humana.",
+          "explanation": "La introducción presenta el tema y orienta la explicación.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 10,
+          "title": "Parágrafo",
+          "enunciado": "Nombra las tres partes esenciales de un párrafo bien estructurado.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Idea principal, desarrollo y cierre o conclusión.",
+          "explanation": "Un párrafo organiza el pensamiento en secuencia clara.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 11,
+          "title": "Conectores de orden",
+          "enunciado": "Escribe una secuencia de tres conectores para ordenar ideas: primero, segundo, tercero.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "En primer lugar, a continuación, por último.",
+          "explanation": "Los conectores de orden guían la estructura del texto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 12,
+          "title": "Modalidad y tono",
+          "enunciado": "Explica la diferencia entre un texto neutral y uno persuasivo.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "El neutral informa sin imponer; el persuasivo busca convencer mediante argumentos y apelación emocional.",
+          "explanation": "El tono y la modalidad definen la intención del discurso.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 13,
+          "title": "Coherencia temática",
+          "enunciado": "¿Qué hace que un texto sea incoherente si cambia de tema de forma abrupta?",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Porque rompe la continuidad temática y la relación lógica entre ideas.",
+          "explanation": "La coherencia exige continuidad y pertinencia temática.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 14,
+          "title": "Conclusión",
+          "enunciado": "Escribe una conclusión para un texto sobre la importancia del trabajo en equipo.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "En conclusión, el trabajo en equipo favorece la cooperación, la creatividad y la resolución de problemas.",
+          "explanation": "La conclusión sintetiza el valor del tema tratado.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 15,
+          "title": "Texto narrativo",
+          "enunciado": "Indica qué elementos narrativos faltan en esta secuencia: “Un día, Ana salió de su casa. Vio a un perro en la calle y corrió”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Faltan el marco temporal, el conflicto o la intención narrativa clara, y una resolución.",
+          "explanation": "La narración suele incluir personajes, acción, espacio, tiempo y conflicto.",
+          "source": "elaboración propia"
+        }
+      ]
+    },
+    {
+      "level_id": 6,
+      "name": "Producción y revisión de textos",
+      "source": "elaboración propia",
+      "description": "Práctica de redacción, edición, estilo, revisión y organización textual para contextos académicos y profesionales.",
+      "exercises": [
+        {
+          "number": 1,
+          "title": "Organización del párrafo",
+          "enunciado": "Ordena estas frases para formar un párrafo lógico: “Además, se mejoran las relaciones interpersonales. El trabajo en equipo favorece la resolución de problemas. Por ello, es clave en proyectos académicos”.",
+          "type": "order",
+          "difficulty": 2,
+          "answer": [
+            "El trabajo en equipo favorece la resolución de problemas.",
+            "Además, se mejoran las relaciones interpersonales.",
+            "Por ello, es clave en proyectos académicos."
+          ],
+          "explanation": "La estructura lógica sigue una idea principal, desarrollo y conclusión.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 2,
+          "title": "Estilo formal",
+          "enunciado": "Reescribe en estilo formal: “Tienes que entregar el informe antes del viernes”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Es necesario entregar el informe antes del viernes.",
+          "explanation": "El registro formal evita expresiones coloquiales y mantiene neutralidad.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 3,
+          "title": "Redundancia",
+          "enunciado": "Corrige la redundancia: “Sube arriba y entra hacia adentro”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Sube o entra.",
+          "explanation": "La redundancia repite ideas sin aportar información nueva.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 4,
+          "title": "Variedad sintáctica",
+          "enunciado": "Escribe dos maneras distintas de decir: “El autor explica el problema con claridad”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "El autor expone el problema con claridad. / El problema queda explicado con claridad por el autor.",
+          "explanation": "La variedad sintáctica mejora la fluidez y evita repeticiones.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 5,
+          "title": "Voz activa",
+          "enunciado": "Pasa a voz activa: “El informe fue leído por el comité”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "El comité leyó el informe.",
+          "explanation": "La voz activa suele ser más directa y clara.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 6,
+          "title": "Párrafo de cierre",
+          "enunciado": "Escribe un cierre breve para un texto sobre la lectura diaria.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "En suma, la lectura diaria fortalece el pensamiento crítico y mejora la capacidad de expresión.",
+          "explanation": "El cierre resume la intención principal del texto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 7,
+          "title": "Corrección de concordancia",
+          "enunciado": "Corrige: “La mayoría de las propuestas fueron rechazadas”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "La mayoría de las propuestas fue rechazada.",
+          "explanation": "La concordancia depende del núcleo del sujeto.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 8,
+          "title": "Uso de pronombres",
+          "enunciado": "Reescribe para evitar repetición: “Ana leyó el libro y Ana anotó ideas de Ana”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Ana leyó el libro y anotó varias ideas.",
+          "explanation": "Los pronombres y la sustitución lexical reducen repetición innecesaria.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 9,
+          "title": "Marcadores de secuencia",
+          "enunciado": "Escribe una secuencia de cuatro pasos para preparar una exposición oral.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Elegir el tema, recopilar información, organizar ideas y practicar la exposición.",
+          "explanation": "La secuencia ordena la actividad en etapas claras.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 10,
+          "title": "Estilo académico",
+          "enunciado": "Reescribe: “La gente no se pone de acuerdo fácilmente” en estilo académico.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Las personas suelen presentar dificultades para llegar a un consenso.",
+          "explanation": "El estilo académico usa formulación más objetiva y precisa.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 11,
+          "title": "Revisión ortográfica",
+          "enunciado": "Corrige: “El alumno hizo un analisis profundo y entrego su tarea”.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "El alumno hizo un análisis profundo y entregó su tarea.",
+          "explanation": "La revisión ortográfica corrige errores de acentuación y formas verbales.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 12,
+          "title": "Email formal",
+          "enunciado": "Escribe una frase de saludo apropiada para un correo formal.",
+          "type": "written",
+          "difficulty": 1,
+          "answer": "Estimado/a profesor/a: le escribo para solicitar una cita sobre el proyecto.",
+          "explanation": "El saludo formal orienta el tono del mensaje.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 13,
+          "title": "Resumen de un informe",
+          "enunciado": "Resume en tres líneas: “El informe indicó que la productividad aumentó tras la reorganización del trabajo”.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "El informe concluye que la reorganización del trabajo aumentó la productividad.",
+          "explanation": "El resumen conserva la idea clave y omite elementos secundarios.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 14,
+          "title": "Cierre de texto argumentativo",
+          "enunciado": "Escribe una conclusión para defender la lectura como hábito formativo.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Por tanto, la lectura debe considerarse una práctica esencial para el desarrollo intelectual y personal.",
+          "explanation": "La conclusión refuerza la tesis con una síntesis final.",
+          "source": "elaboración propia"
+        },
+        {
+          "number": 15,
+          "title": "Autoevaluación final",
+          "enunciado": "Explica qué aspectos revisas antes de entregar un texto: contenido, estructura, lenguaje y corrección.",
+          "type": "written",
+          "difficulty": 2,
+          "answer": "Revizo la claridad de las ideas, la organización del texto, la coherencia entre párrafos, la precisión del vocabulario y la corrección ortográfica y gramatical.",
+          "explanation": "La autoevaluación final garantiza la calidad del texto.",
+          "source": "elaboración propia"
+        }
+      ]
+    }
+  ]
+}

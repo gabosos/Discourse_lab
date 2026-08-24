@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Proyecto final — Discourse Lab{% endblock %}
+
+{% block content %}
+<div class="dl-detail-page">
+  <div class="dl-mission-hero dl-reveal" style="margin-bottom:var(--dl-space-8)">
+    <p class="dl-eyebrow">Misión final</p>
+    <h1>Proyecto integrador de discurso organizacional</h1>
+    <p>Integra aprendizaje, análisis y práctica en un caso real de comunicación organizacional. Esta experiencia está pensada para demostrar tu capacidad de construir mensajes efectivos en contextos profesionales.</p>
+  </div>
+
+  <div class="dl-triple-grid dl-reveal">
+    <div class="dl-card">
+      <div class="dl-stat-icon signal" style="margin-bottom:var(--dl-space-3)">📝</div>
+      <h3 style="font-size:var(--dl-text-lg);margin-bottom:var(--dl-space-2)">Análisis</h3>
+      <p class="dl-muted" style="font-size:var(--dl-text-sm)">Aplica herramientas pragmáticas y semánticas a un caso organizacional real.</p>
+    </div>
+    <div class="dl-card">
+      <div class="dl-stat-icon amber" style="margin-bottom:var(--dl-space-3)">🎙️</div>
+      <h3 style="font-size:var(--dl-text-lg);margin-bottom:var(--dl-space-2)">Simulación</h3>
+      <p class="dl-muted" style="font-size:var(--dl-text-sm)">Participa en un simulador de comunicación profesional con retroalimentación.</p>
+    </div>
+    <div class="dl-card">
+      <div class="dl-stat-icon violet" style="margin-bottom:var(--dl-space-3)">📊</div>
+      <h3 style="font-size:var(--dl-text-lg);margin-bottom:var(--dl-space-2)">Entrega</h3>
+      <p class="dl-muted" style="font-size:var(--dl-text-sm)">Presenta tu propuesta y obtén evaluación con criterios profesionales.</p>
+    </div>
+  </div>
+
+  <div class="dl-card dl-reveal">
+    <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Requisitos para iniciar</p>
+    <div class="dl-mission-list">
+      <div class="dl-mission-row">
+        <div class="dl-mission-status done">✓</div>
+        <div class="dl-mission-info"><strong>Completar Nivel 1-3</strong><span>Fonética, Morfología, Sintaxis</span></div>
+      </div>
+      <div class="dl-mission-row">
+        <div class="dl-mission-status active">▶</div>
+        <div class="dl-mission-info"><strong>Avance mínimo 60% en Nivel 4-6</strong><span>Semántica, Pragmática, Discurso</span></div>
+      </div>
+      <div class="dl-mission-row">
+        <div class="dl-mission-status locked"><svg class="dl-brand-mark-mini" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 30C14 23.4 19.4 18 26 18H32V30C32 31.1 31.1 32 30 32H14V30Z" fill="#14B8A6"/><path d="M14 16H24C25.1 16 26 16.9 26 18V24H14V16Z" fill="#F59E0B" fill-opacity="0.85"/><circle cx="36" cy="14" r="3" fill="#F59E0B"/></svg></div>
+        <div class="dl-mission-info"><strong>Simulador Profesional</strong><span>Actividad previa requerida</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:var(--dl-space-3);margin-top:var(--dl-space-6)">
+      <a class="dl-btn dl-btn-primary dl-btn-lg" href="{{ url_for('main.activity', slug='proyecto-final') }}">Iniciar proyecto</a>
+      <a class="dl-btn dl-btn-secondary" href="{{ url_for('main.certificate') }}">Ver diploma digital</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

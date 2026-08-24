@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Perfil — {{ student.name }} | Discourse Lab{% endblock %}
+
+{% block content %}
+<div class="dl-section-header dl-reveal">
+  <div style="display:flex;align-items:center;gap:var(--dl-space-5)">
+    <div class="dl-avatar" style="width:64px;height:64px;font-size:var(--dl-text-xl)">{{ student.initials }}</div>
+    <div>
+      <p class="dl-eyebrow">Perfil del estudiante</p>
+      <h2>{{ student.name }}</h2>
+      <p class="dl-muted" style="font-size:var(--dl-text-sm)">Nivel {{ student.level }} · {{ student.xp }} XP · {{ student.coins }} monedas · Enfoque en discurso organizacional</p>
+    </div>
+  </div>
+</div>
+
+<div class="dl-dashboard-grid">
+  <div class="dl-dashboard-main">
+    <div class="dl-stats-row" style="margin-top:0">
+      <article class="dl-stat-card">
+        <div class="dl-stat-icon signal">⚡</div>
+        <div class="dl-stat-value" data-target="{{ student.xp }}">0</div>
+        <div class="dl-stat-label">XP total</div>
+      </article>
+      <article class="dl-stat-card">
+        <div class="dl-stat-icon coral">🔥</div>
+        <div class="dl-stat-value" data-target="{{ metrics.streak }}">0</div>
+        <div class="dl-stat-label">Racha actual</div>
+      </article>
+      <article class="dl-stat-card">
+        <div class="dl-stat-icon amber">🪙</div>
+        <div class="dl-stat-value" data-target="{{ student.coins }}">0</div>
+        <div class="dl-stat-label">Monedas</div>
+      </article>
+      <article class="dl-stat-card">
+        <div class="dl-stat-icon violet">🏆</div>
+        <div class="dl-stat-value" data-target="{{ metrics.achievements }}">0</div>
+        <div class="dl-stat-label">Logros</div>
+      </article>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Dominio por área</p>
+      <div class="dl-mission-list">
+        {% for item in level_summary %}
+        <div class="dl-mission-row">
+          <div class="dl-mission-info">
+            <strong>{{ item.title }}</strong>
+            <span>{{ item.progress }}% dominio</span>
+          </div>
+          <div class="dl-progress-track" style="width:120px">
+            <div class="dl-progress-fill" style="width:{{ item.progress }}%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Actividad reciente</p>
+      {% for entry in history %}
+      <div class="dl-history-row">
+        <span class="dl-history-date">{{ entry.date }}</span>
+        <div class="dl-history-info">
+          <strong>{{ entry.activity }}</strong>
+        </div>
+        <span class="dl-history-score">{{ entry.score }}%</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="dl-dashboard-aside">
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Progreso de nivel</p>
+      <div class="dl-sidebar-xp" style="margin:0;background:var(--dl-bg-hover)">
+        <div class="dl-sidebar-xp-header">
+          <span class="dl-sidebar-xp-level">Nivel {{ student.level }}</span>
+        </div>
+        <div class="dl-sidebar-xp-bar">
+          <div class="dl-sidebar-xp-fill" style="width:{{ (student.xp_in_level / student.xp_to_next * 100)|int }}%"></div>
+        </div>
+        <div class="dl-sidebar-xp-label">{{ student.xp_remaining }} XP para nivel {{ student.level + 1 }}</div>
+      </div>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Logros desbloqueados</p>
+      <div class="dl-achievements-grid" style="grid-template-columns:repeat(2,1fr)">
+        {% for ach in achievements if ach.unlocked %}
+        <div class="dl-achievement unlocked">
+          <div class="dl-achievement-icon">{{ ach.icon }}</div>
+          <div class="dl-achievement-name">{{ ach.name }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Configuración</p>
+      <div style="display:grid;gap:var(--dl-space-3)">
+        <button class="dl-btn dl-btn-secondary" id="themeToggleProfile">Cambiar tema</button>
+        <button class="dl-btn dl-btn-ghost" id="reminderToggle" type="button">Activar recordatorios</button>
+        <a class="dl-btn dl-btn-ghost" href="{{ url_for('main.certificate') }}">Ver certificación →</a>
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

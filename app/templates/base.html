@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Plataforma Interactiva Explora el Discurso Organizacional — Discourse Lab{% endblock %}</title>
+  <meta name="description" content="{% block description %}Plataforma interactiva para aprender discurso organizacional, análisis lingüístico y comunicación profesional.{% endblock %}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="dl-app">
+    <div class="dl-sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <aside class="dl-sidebar" id="sidebar">
+      <a href="{{ url_for('main.home') }}" class="dl-brand">
+        <img src="{{ url_for('static', filename='icons/logo.svg') }}" alt="Discourse Lab" />
+        <div>
+          <div class="dl-brand-name">Discourse Lab</div>
+          <div class="dl-brand-tag">Ink &amp; Signal</div>
+        </div>
+      </a>
+
+      <nav class="dl-nav">
+        {% if student.role == 'teacher' %}
+        <a class="dl-nav-link {% if active_page == 'teacher' %}active{% endif %}" href="{{ url_for('main.teacher_dashboard') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard docente
+        </a>
+        <a class="dl-nav-link" href="{{ url_for('main.teacher_dashboard') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Analizar estudiantes
+        </a>
+        {% else %}
+        <a class="dl-nav-link {% if active_page == 'home' %}active{% endif %}" href="{{ url_for('main.home') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+          Inicio
+        </a>
+        <a class="dl-nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('main.dashboard') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Panel
+        </a>
+        <a class="dl-nav-link" href="{{ url_for('main.home') }}#recorrido">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Misiones
+        </a>
+        <a class="dl-nav-link {% if active_page == 'final_project' %}active{% endif %}" href="{{ url_for('main.final_project') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Proyecto
+        </a>
+
+        <div class="dl-nav-section">Progreso</div>
+        <a class="dl-nav-link {% if active_page == 'profile' %}active{% endif %}" href="{{ url_for('main.profile') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Perfil
+        </a>
+        <a class="dl-nav-link {% if active_page == 'certificate' %}active{% endif %}" href="{{ url_for('main.certificate') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg>
+          Logros
+        </a>
+        {% endif %}
+      </nav>
+
+      {% if student is defined %}
+      <div class="dl-sidebar-xp">
+        <div class="dl-sidebar-xp-header">
+          <span class="dl-sidebar-xp-level">Nivel {{ student.level }}</span>
+          <span class="dl-muted" style="font-size:0.75rem">{{ student.xp }} XP</span>
+        </div>
+        <div class="dl-sidebar-xp-bar">
+          <div class="dl-sidebar-xp-fill" style="width: {{ (student.xp_in_level / student.xp_to_next * 100)|int }}%"></div>
+        </div>
+        <div class="dl-sidebar-xp-label">{{ student.xp_remaining }} XP para subir de nivel</div>
+      </div>
+      {% endif %}
+    </aside>
+
+    <div class="dl-main">
+      <header class="dl-topbar">
+        <div class="dl-topbar-left">
+          <button class="dl-mobile-toggle" id="sidebarToggle" aria-label="Menú">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <button class="dl-search-trigger" id="searchTrigger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <span>Buscar niveles, actividades…</span>
+            <kbd>⌘K</kbd>
+          </button>
+        </div>
+        <div class="dl-topbar-right">
+          {% if metrics is defined %}
+          <div class="dl-streak-pill">
+            <svg class="dl-streak-flame" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2c2 4-1 5 1 8 1-2 3-3 4-5 3 5 4 11-1 15a8 8 0 01-10-1c-4-5-1-11 2-14 0 3 1 4 4 5"/></svg>
+            <span class="dl-streak-count" data-target="{{ metrics.streak }}">0</span> días
+          </div>
+          {% endif %}
+          <button class="dl-icon-btn" id="themeToggle" aria-label="Cambiar tema">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 109 9 7 7 0 01-9-9z"/></svg>
+          </button>
+          <button class="dl-icon-btn" id="notifToggle" aria-label="Notificaciones">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            {% if notifications is defined %}
+            <span class="dl-badge-dot"></span>
+            {% endif %}
+          </button>
+          {% if student is defined %}
+          <a href="{{ url_for('main.profile') }}" class="dl-avatar" title="{{ student.name }}">{{ student.initials }}</a>
+          <a class="dl-btn dl-btn-ghost dl-btn-sm" href="{{ url_for('main.logout') }}">Salir</a>
+          {% endif %}
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="dl-flash-wrapper">
+        {% for category, message in messages %}
+        <div class="dl-flash-message {{ category if category in ['success', 'danger', 'info'] else 'info' }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <main class="dl-page dl-page-enter">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  {% if notifications is defined %}
+  <div class="dl-notif-panel" id="notifPanel">
+    <div class="dl-notif-header">
+      <strong>Notificaciones</strong>
+      <button class="dl-btn-ghost dl-btn-sm" id="notifClose">Cerrar</button>
+    </div>
+    {% for notif in notifications %}
+    <div class="dl-notif-item {% if notif.unread %}unread{% endif %}">
+      <div class="dl-notif-icon">{{ notif.icon }}</div>
+      <div class="dl-notif-body">
+        <strong>{{ notif.title }}</strong>
+        <p>{{ notif.body }}</p>
+        <div class="dl-notif-time">{{ notif.time }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if search_index is defined %}
+  <div class="dl-search-overlay" id="searchOverlay">
+    <div class="dl-search-box">
+      <div class="dl-search-input-wrap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input class="dl-search-input" id="searchInput" type="text" placeholder="Buscar niveles, actividades, páginas…" autocomplete="off" />
+      </div>
+      <div class="dl-search-results" id="searchResults">
+        {% for item in search_index %}
+        <a class="dl-search-result" href="{{ item.url }}" data-title="{{ item.title|lower }}">
+          <span class="dl-search-result-type">{{ item.type }}</span>
+          <span>{{ item.title }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="dl-toast-container" id="toastContainer"></div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

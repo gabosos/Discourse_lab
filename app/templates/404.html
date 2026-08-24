@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Página no encontrada — Discourse Lab{% endblock %}
+
+{% block content %}
+<div class="dl-detail-page dl-reveal" style="text-align:center; padding: var(--dl-space-10) 0;">
+  <p class="dl-eyebrow">404</p>
+  <h1>No encontramos esa página</h1>
+  <p class="dl-muted" style="max-width:560px; margin: var(--dl-space-4) auto;">La URL que intentaste abrir no existe. Regresa al inicio o explora tu panel.</p>
+  <div style="display:flex; justify-content:center; gap:var(--dl-space-3); margin-top:var(--dl-space-6);">
+    <a class="dl-btn dl-btn-primary" href="{{ url_for('main.home') }}">Volver al inicio</a>
+    <a class="dl-btn dl-btn-secondary" href="{{ url_for('main.dashboard') }}">Ir al panel</a>
+  </div>
+</div>
+{% endblock %}

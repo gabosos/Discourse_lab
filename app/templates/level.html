@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ level.title }} — Discourse Lab{% endblock %}
+
+{% block content %}
+<div class="dl-detail-page">
+  <div class="dl-detail-header dl-reveal">
+    <a class="dl-btn dl-btn-ghost" href="{{ url_for('main.home') }}#recorrido" style="margin-bottom:var(--dl-space-4)">← Volver al mapa</a>
+    <p class="dl-eyebrow">Nivel {{ '%02d'|format(level.id) }}</p>
+    <h1>{{ level.title }}</h1>
+    <p class="dl-muted" style="font-size:var(--dl-text-lg);margin-top:var(--dl-space-3);max-width:560px">
+      {% if detail.status == 'locked' %}
+      Completa los niveles anteriores para desbloquear este módulo y avanzar en el análisis del discurso organizacional.
+      {% else %}
+      Explora prácticas reales, evalúa mensajes organizacionales y construye propuestas comunicativas con actividades interactivas.
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="dl-card dl-reveal" style="margin-bottom:var(--dl-space-6)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--dl-space-3)">
+      <span style="font-size:var(--dl-text-sm);font-weight:600">Progreso del nivel</span>
+      <span class="dl-mono" style="font-family:var(--dl-font-mono);color:var(--dl-accent);font-weight:600">{{ detail.progress }}%</span>
+    </div>
+    <div class="dl-progress-track" style="height:10px">
+      <div class="dl-progress-fill" data-progress="{{ detail.progress }}"></div>
+    </div>
+    <div style="display:flex;gap:var(--dl-space-6);margin-top:var(--dl-space-4)">
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Actividades</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{{ detail.activities_detail|length }}</strong>
+      </div>
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">XP disponible</span>
+        <strong style="display:block;font-size:var(--dl-text-sm);color:var(--dl-amber)">
+          {{ detail.activities_detail|sum(attribute='xp') }} XP
+        </strong>
+      </div>
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Estado</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">
+          {% if detail.status == 'completed' %}Completado{% elif detail.status == 'locked' %}Bloqueado{% else %}En curso{% endif %}
+        </strong>
+      </div>
+    </div>
+  </div>
+
+  <p class="dl-eyebrow dl-reveal" style="margin-bottom:var(--dl-space-4)">Actividades del nivel</p>
+  <div class="dl-activity-timeline">
+    {% for activity in detail.activities_detail %}
+    <div class="dl-activity-item dl-reveal" data-activity="{{ activity.name }}">
+      <div class="dl-activity-num">{{ loop.index }}</div>
+      <div class="dl-activity-body">
+        <h4>{{ activity.name }}</h4>
+        <p>{{ activity.duration }} · +{{ activity.xp }} XP · {{ activity.type | title }}</p>
+      </div>
+      {% if detail.status != 'locked' and activity.unlocked and activity.slug %}
+      <a class="dl-btn dl-btn-sm dl-btn-primary activity-start" href="{{ url_for('main.activity', slug=activity.slug) }}">Iniciar</a>
+      {% elif detail.status != 'locked' and not activity.unlocked %}
+      <span class="dl-btn dl-btn-sm dl-btn-secondary">Bloqueado</span>
+      {% else %}
+      <span class="dl-muted" style="font-size:var(--dl-text-xs)"><svg class="dl-brand-mark-mini" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 30C14 23.4 19.4 18 26 18H32V30C32 31.1 31.1 32 30 32H14V30Z" fill="#14B8A6"/><path d="M14 16H24C25.1 16 26 16.9 26 18V24H14V16Z" fill="#F59E0B" fill-opacity="0.85"/><circle cx="36" cy="14" r="3" fill="#F59E0B"/></svg></span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if detail.status != 'locked' and detail.has_unlocked_activity %}
+  <div style="display:flex;gap:var(--dl-space-3);margin-top:var(--dl-space-6)" class="dl-reveal">
+    <button class="dl-btn dl-btn-primary dl-btn-lg" id="startLevel">Comenzar primera actividad</button>
+    <a class="dl-btn dl-btn-secondary" href="{{ url_for('main.dashboard') }}">Ver en panel</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('startLevel')?.addEventListener('click', () => {
+    const first = document.querySelector('.activity-start');
+    if (first && first.href) {
+      window.location.href = first.href;
+    }
+  });
+</script>
+{% endblock %}

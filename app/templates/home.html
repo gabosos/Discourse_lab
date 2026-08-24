@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Discourse Lab — Tu expedición de hoy{% endblock %}
+
+{% block content %}
+{% set next_xp = student.xp_remaining %}
+<section class="dl-expedition dl-reveal">
+  <div class="dl-expedition-copy">
+    <div class="dl-live-label"><span></span> Laboratorio de discurso · en línea</div>
+    <p class="dl-eyebrow">{{ 'Qué bueno verte de nuevo' if user_registered else 'Tu laboratorio de lenguaje' }}</p>
+    <h1>{% if user_registered %}Hola, {{ student.name.split()[0] }}.<br><em>Tu próxima idea</em> está por tomar forma.{% else %}Convierte el lenguaje<br>en una <em>habilidad real.</em>{% endif %}</h1>
+    <p class="dl-expedition-lead">Analiza, construye y domina mensajes que mueven equipos. Cada misión combina lingüística aplicada con retos breves y memorables.</p>
+    {% if not user_registered %}
+    <form action="{{ url_for('main.home') }}" method="POST" class="dl-identity-form">
+      <label for="username">¿Cómo te llamamos?</label>
+      <div><input id="username" name="username" type="text" placeholder="Escribe tu nombre" required minlength="3" maxlength="32" /><button class="dl-btn dl-btn-primary dl-btn-lg" type="submit">Abrir mi laboratorio <span>→</span></button></div>
+    </form>
+    {% else %}
+    <div class="dl-expedition-actions">
+      <a class="dl-btn dl-btn-primary dl-btn-lg" href="{{ url_for('main.level_detail', level_id=continue_learning.level_id) }}">Continuar misión <span>→</span></a>
+      <a class="dl-btn dl-btn-secondary dl-btn-lg" href="#recorrido">Explorar misiones</a>
+    </div>
+    <div class="dl-next-achievement">
+      <div class="dl-achievement-orbit">✦</div><div><span>PRÓXIMO HITO</span><strong>{{ next_xp }} XP para alcanzar el nivel {{ student.level + 1 }}</strong></div>
+      <div class="dl-mini-progress"><i style="width: {{ (student.xp / student.xp_to_next * 100)|int }}%"></i></div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="dl-luma-scene" aria-label="Luma, guía del laboratorio de discurso">
+    <div class="dl-scene-grid"></div><div class="dl-orbit dl-orbit-one"></div><div class="dl-orbit dl-orbit-two"></div>
+    <div class="dl-floating-token token-sound">⌁ <small>FONÉTICA</small></div><div class="dl-floating-token token-syntax">⌘ <small>SINTAXIS</small></div><div class="dl-floating-token token-semantic">✦ <small>SENTIDO</small></div>
+    <div class="dl-luma"><div class="dl-luma-halo"></div><div class="dl-luma-head"><i></i><b></b></div><div class="dl-luma-body"><span></span></div><div class="dl-luma-tablet">▱</div></div>
+    <div class="dl-guide-note"><span class="dl-guide-avatar">L</span><p><strong>Luma dice</strong>“Una frase clara puede cambiar una decisión.”</p></div>
+  </div>
+</section>
+
+{% if user_registered %}
+<section class="dl-command-deck dl-reveal">
+  <div class="dl-command-item"><span class="dl-command-icon xp">⚡</span><div><small>ENERGÍA DE IDEAS</small><strong>{{ student.xp }} <em>XP</em></strong></div></div>
+  <div class="dl-command-item"><span class="dl-command-icon streak">↗</span><div><small>RITMO ACTUAL</small><strong>{{ metrics.streak }} <em>días</em></strong></div></div>
+  <div class="dl-command-item"><span class="dl-command-icon coin">◒</span><div><small>CRÉDITOS DEL LAB</small><strong>{{ student.coins }} <em>monedas</em></strong></div></div>
+  <div class="dl-command-item dl-command-goal"><div class="dl-goal-dial" style="--goal:{{ daily_goal.percent }}"><span>{{ daily_goal.percent }}%</span></div><div><small>OBJETIVO DE HOY</small><strong>{{ daily_goal.current }}/{{ daily_goal.target }} <em>min</em></strong></div></div>
+</section>
+
+<section class="dl-mission-brief dl-reveal">
+  <div class="dl-brief-label">Misión recomendada <span>01</span></div>
+  <div class="dl-brief-main"><p>RETOMA EL HILO</p><h2>{{ continue_learning.title }}</h2><span>{{ continue_learning.level }} · {{ continue_learning.progress }}% explorado</span></div>
+  <div class="dl-brief-reward"><small>RECOMPENSA</small><strong>+{{ continue_learning.xp_reward }} XP</strong></div>
+  <a href="{{ url_for('main.level_detail', level_id=continue_learning.level_id) }}" class="dl-brief-arrow" aria-label="Continuar misión">→</a>
+</section>
+{% endif %}
+
+<section id="recorrido" class="dl-journey-section">
+  <div class="dl-section-heading dl-reveal"><div><p class="dl-eyebrow">El mapa de investigación</p><h2>Seis territorios.<br><em>Una voz más precisa.</em></h2></div><p>Avanza por los sistemas que hacen que un mensaje sea claro, persuasivo y humano.</p></div>
+  <div class="dl-journey dl-reveal">
+    {% for level in levels %}
+    <a class="dl-level-card" data-status="{{ level.status }}" href="{{ url_for('main.level_detail', level_id=level.id) }}">
+      <div class="dl-level-header"><span class="dl-level-num">SECTOR {{ '%02d'|format(level.id) }}</span><span class="dl-level-badge {% if level.status == 'completed' %}done{% elif level.status == 'locked' %}locked{% endif %}">{% if level.status == 'completed' %}Dominado{% elif level.status == 'locked' %}Sellado{% else %}En exploración{% endif %}</span></div>
+      <span class="dl-sector-glyph">{{ ['◌','⌘','⌁','◇','◍','✦'][loop.index0] }}</span><h3>{{ level.title }}</h3>
+      <p>{{ level.activity_count if level.activity_count is defined else level.activities|length }} experimentos disponibles</p><div class="dl-progress-track"><div class="dl-progress-fill" style="width:{{ level.progress }}%"></div></div><div class="dl-progress-meta"><span>{{ level.progress }}% cartografiado</span><span>→</span></div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

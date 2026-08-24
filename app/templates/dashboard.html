@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Panel del estudiante — Discourse Lab{% endblock %}
+
+{% block content %}
+<div class="dl-section-header dl-reveal">
+  <div>
+    <p class="dl-eyebrow">Centro de aprendizaje</p>
+    <h2>Hola, {{ student.name.split()[0] }}</h2>
+    <p class="dl-muted" style="margin-top:var(--dl-space-2); max-width: 560px;">Revisa tu avance en el análisis del discurso organizacional y continúa con actividades diseñadas para fortalecer tu práctica profesional.</p>
+  </div>
+  <a class="dl-btn dl-btn-primary" href="{{ url_for('main.level_detail', level_id=continue_learning.level_id) }}">Seguir con tu proyecto</a>
+</div>
+
+<div class="dl-dashboard-grid">
+  <div class="dl-dashboard-main">
+    <div class="dl-tabs dl-reveal" role="tablist">
+      <button class="dl-tab active" data-tab="overview">Resumen</button>
+      <button class="dl-tab" data-tab="missions">Misiones</button>
+      <button class="dl-tab" data-tab="history">Historial</button>
+      <button class="dl-tab" data-tab="achievements">Logros</button>
+    </div>
+
+    <div class="dl-tab-panel active" id="overview">
+      <div class="dl-stats-row" style="margin-top:0">
+        <article class="dl-stat-card">
+          <div class="dl-stat-icon signal">⚡</div>
+          <div class="dl-stat-value" data-target="{{ metrics.xp }}">0</div>
+          <div class="dl-stat-label">XP total</div>
+        </article>
+        <article class="dl-stat-card">
+          <div class="dl-stat-icon coral">🔥</div>
+          <div class="dl-stat-value" data-target="{{ metrics.streak }}">0</div>
+          <div class="dl-stat-label">Racha</div>
+        </article>
+        <article class="dl-stat-card">
+          <div class="dl-stat-icon amber">📋</div>
+          <div class="dl-stat-value" data-target="{{ metrics.missions_done }}">0</div>
+          <div class="dl-stat-label">Misiones</div>
+        </article>
+        <article class="dl-stat-card">
+          <div class="dl-stat-icon violet">📈</div>
+          <div class="dl-stat-value" data-target="{{ metrics.completion }}">0</div>
+          <div class="dl-stat-label">% avance</div>
+        </article>
+      </div>
+
+      <div class="dl-card dl-reveal">
+        <div class="dl-section-header" style="margin-bottom:var(--dl-space-4)">
+          <h3 style="font-size:var(--dl-text-lg)">Actividad semanal</h3>
+          <span class="dl-muted" style="font-size:var(--dl-text-sm)">Minutos de estudio</span>
+        </div>
+        <div class="dl-chart-bars">
+          {% set max_min = weekly_activity|map(attribute='minutes')|max %}
+          {% for day in weekly_activity %}
+          <div class="dl-chart-bar">
+            <div class="dl-chart-bar-fill" style="height:{{ (day.minutes / max_min * 100)|int }}%"></div>
+            <span class="dl-chart-bar-label">{{ day.day }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="dl-card dl-reveal">
+        <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Progreso por nivel</p>
+        <div class="dl-mission-list">
+          {% for item in level_summary %}
+          <div class="dl-mission-row">
+            <div class="dl-mission-status {% if item.status == 'completed' %}done{% elif item.status == 'locked' %}locked{% else %}active{% endif %}">
+              {% if item.status == 'completed' %}✓{% elif item.status == 'locked' %}<svg class="dl-brand-mark-mini" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 30C14 23.4 19.4 18 26 18H32V30C32 31.1 31.1 32 30 32H14V30Z" fill="#14B8A6"/><path d="M14 16H24C25.1 16 26 16.9 26 18V24H14V16Z" fill="#F59E0B" fill-opacity="0.85"/><circle cx="36" cy="14" r="3" fill="#F59E0B"/></svg>{% else %}{{ item.id }}{% endif %}
+            </div>
+            <div class="dl-mission-info">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.progress }}% dominio</span>
+            </div>
+            <div class="dl-progress-track" style="width:80px">
+              <div class="dl-progress-fill" style="width:{{ item.progress }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="dl-tab-panel" id="missions">
+      <div class="dl-mission-list">
+        {% for mission in missions %}
+        <div class="dl-mission-row">
+          <div class="dl-mission-status {{ mission.status }}">
+            {% if mission.status == 'done' %}✓{% elif mission.status == 'locked' %}<svg class="dl-brand-mark-mini" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 30C14 23.4 19.4 18 26 18H32V30C32 31.1 31.1 32 30 32H14V30Z" fill="#14B8A6"/><path d="M14 16H24C25.1 16 26 16.9 26 18V24H14V16Z" fill="#F59E0B" fill-opacity="0.85"/><circle cx="36" cy="14" r="3" fill="#F59E0B"/></svg>{% else %}▶{% endif %}
+          </div>
+          <div class="dl-mission-info">
+            <strong>{{ mission.title }}</strong>
+            <span>{{ mission.level }}</span>
+          </div>
+          <span class="dl-mission-xp">+{{ mission.xp }} XP</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="dl-tab-panel" id="history">
+      <div class="dl-card">
+        {% for entry in history %}
+        <div class="dl-history-row">
+          <span class="dl-history-date">{{ entry.date }}</span>
+          <div class="dl-history-info">
+            <strong>{{ entry.activity }}</strong>
+            <span class="dl-muted" style="font-size:var(--dl-text-xs)"> +{{ entry.xp }} XP</span>
+          </div>
+          <span class="dl-history-score">{{ entry.score }}%</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="dl-tab-panel" id="achievements">
+      <div class="dl-achievements-grid">
+        {% for ach in achievements %}
+        <div class="dl-achievement {% if ach.unlocked %}unlocked{% else %}locked{% endif %}">
+          <div class="dl-achievement-icon">{{ ach.icon }}</div>
+          <div class="dl-achievement-name">{{ ach.name }}</div>
+          <div class="dl-achievement-desc">{{ ach.desc }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <aside class="dl-dashboard-aside">
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Meta diaria</p>
+      <div class="dl-daily-goal" style="padding:0">
+        <div class="dl-ring">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle class="dl-ring-bg" cx="36" cy="36" r="30"/>
+            <circle class="dl-ring-fill" cx="36" cy="36" r="30"
+              stroke-dasharray="188.5"
+              stroke-dashoffset="{{ 188.5 - (188.5 * daily_goal.percent / 100) }}"/>
+          </svg>
+          <div class="dl-ring-text">{{ daily_goal.percent }}%</div>
+        </div>
+        <div>
+          <strong>{{ daily_goal.current }}/{{ daily_goal.target }} min</strong>
+          <p class="dl-muted" style="font-size:var(--dl-text-xs);margin-top:2px">Objetivo de hoy</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Calendario de estudio</p>
+      <div class="dl-heatmap">
+        {% for level in streak_calendar %}
+        <div class="dl-heatmap-day" data-level="{{ level }}" title="Día de estudio"></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Ranking semanal</p>
+      <div class="dl-rank-list">
+        {% for entry in leaderboard %}
+        <div class="dl-rank-item {% if entry.you %}you{% endif %}">
+          <span class="dl-rank-pos {% if entry.rank == 1 %}gold{% endif %}">#{{ entry.rank }}</span>
+          <div class="dl-rank-avatar">{{ entry.initials }}</div>
+          <span class="dl-rank-name">{{ entry.name }}</span>
+          <span class="dl-rank-xp">{{ entry.xp }} XP</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="dl-card dl-reveal">
+      <p class="dl-eyebrow" style="margin-bottom:var(--dl-space-4)">Recomendaciones</p>
+      {% for rec in recommendations %}
+      <div class="dl-rec-card">
+        <div>
+          <strong style="font-size:var(--dl-text-sm)">{{ rec.title }}</strong>
+          <p class="dl-muted" style="font-size:var(--dl-text-xs);margin-top:2px">{{ rec.reason }}</p>
+          {% if rec.action == 'Lee entre Líneas' %}
+          <a class="dl-btn dl-btn-sm dl-btn-ghost" style="margin-top:var(--dl-space-2)" href="{{ url_for('main.level_detail', level_id=5) }}">{{ rec.action }} →</a>
+          {% else %}
+          <a class="dl-btn dl-btn-sm dl-btn-ghost" style="margin-top:var(--dl-space-2)" href="{{ url_for('main.level_detail', level_id=continue_learning.level_id) }}">{{ rec.action }} →</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ block.name }} — Cuadernillo{% endblock %}
+
+{% block content %}
+<div class="dl-detail-page">
+  <div class="dl-detail-header dl-reveal">
+    <a class="dl-btn dl-btn-ghost" href="{{ url_for('main.cuadernillo_view') }}" style="margin-bottom:var(--dl-space-4)">← Volver al cuadernillo</a>
+    <p class="dl-eyebrow">Bloque {{ block.level_id }}</p>
+    <h1>{{ block.name }}</h1>
+    <p class="dl-muted" style="font-size:var(--dl-text-lg);margin-top:var(--dl-space-3);max-width:700px">{{ block.description }}</p>
+  </div>
+
+  <div class="dl-card dl-reveal" style="margin-bottom:var(--dl-space-6)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Fuente</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{{ block.source }}</strong>
+      </div>
+      <div>
+        <span class="dl-muted" style="font-size:var(--dl-text-xs)">Ejercicios</span>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{{ exercises|length }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="dl-activity-timeline">
+    {% for exercise in exercises %}
+    <div class="dl-activity-item dl-reveal">
+      <div class="dl-activity-num">{{ exercise.number }}</div>
+      <div class="dl-activity-body">
+        <h4>{{ exercise.title }}</h4>
+        <p>{{ exercise.enunciado[:220] }}{% if exercise.enunciado|length > 220 %}…{% endif %}</p>
+        <small class="dl-muted">Tipo: {{ exercise.type }} · Dificultad: {{ exercise.difficulty if exercise.difficulty is defined else '—' }}</small>
+      </div>
+      <button class="dl-btn dl-btn-sm dl-btn-primary" type="button" onclick="alert('{{ exercise.answer|tojson|safe }}')">Ver solución</button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

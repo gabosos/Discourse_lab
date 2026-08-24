@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Acceso denegado — Discourse Lab{% endblock %}
+{% block content %}
+<div class="dl-detail-page dl-reveal" style="text-align:center;padding:var(--dl-space-10) 0"><p class="dl-eyebrow">403</p><h1>Acceso denegado</h1><p class="dl-muted">{{ error_message or 'No tienes permiso para acceder a este espacio.' }}</p><a class="dl-btn dl-btn-primary" href="{{ url_for('main.home') }}">Volver al inicio</a></div>
+{% endblock %}
