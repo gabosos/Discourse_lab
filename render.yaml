@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: discourse-lab
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: INITIAL_TEACHER_NAME
+        sync: false
+      - key: INITIAL_TEACHER_EMAIL
+        sync: false
+      - key: INITIAL_TEACHER_PASSWORD
+        sync: false

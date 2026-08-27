@@ -9,16 +9,23 @@ DATA_DIR = BASE_DIR / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
 ENV_DB_PATH = os.getenv("DB_PATH")
-DATABASE_URL = os.getenv("DATABASE_URL", str(DATA_DIR / "educational_platform.db"))
+# SQLite remains convenient for local development. Production should provide a
+# postgresql:// (or postgres://) URL through the hosting provider's secrets.
+DATABASE_URL = os.getenv("DATABASE_URL") or f"sqlite:///{DATA_DIR / 'educational_platform.db'}"
 
 if ENV_DB_PATH:
     DB_PATH = Path(ENV_DB_PATH)
 elif DATABASE_URL.startswith("sqlite:///"):
-    DB_PATH = Path(DATABASE_URL.replace("sqlite://///", "", 1))
+    # ``sqlite:///relative.db`` and ``sqlite:////absolute/path.db`` are both
+    # valid URLs. Keep the leading slash for an absolute path.
+    DB_PATH = Path(DATABASE_URL.removeprefix("sqlite:///"))
 else:
-    DB_PATH = Path(DATABASE_URL)
+    # PostgreSQL is not a filesystem path. This value is only kept for legacy
+    # callers; the database adapter uses DATABASE_URL directly.
+    DB_PATH = DATA_DIR / "educational_platform.db"
 
-DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+if DATABASE_URL.startswith("sqlite:///"):
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 LEVELS = [
     {"id": 1, "title": "Fonética y Fonología", "activities": ["Detective Fonético", "Arrastra la Prosodia", "Reconstruye el Discurso"]},

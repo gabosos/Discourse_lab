@@ -208,7 +208,7 @@ def _load_student():
             "level": (xp // 200) + 1, "xp": xp, "xp_in_level": xp % 200, "xp_to_next": 200, "xp_remaining": 200 - (xp % 200),
             "streak": session_student.get("streak", 0),
             "coins": user.get("coins", 0),
-            "role": "student",
+            "role": user.get("role", "student"),
         }
         return user
     return None

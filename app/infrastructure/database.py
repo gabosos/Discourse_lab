@@ -1,14 +1,78 @@
 import json
+import os
 import sqlite3
 from datetime import datetime
 from typing import Optional
-from app.core.config import DB_PATH
-
-INITIAL_TEACHER_EMAIL = "paola.lenguale@gmail.com"
-INITIAL_TEACHER_PASSWORD_HASH = "pbkdf2:sha256:600000$s2osgMAJYpl9W797$d2072c608f7e01452bf72ff46953684a1560ceacdfc2d25bee1a5387603e2e2f"
+from werkzeug.security import generate_password_hash
+from app.core.config import DATABASE_URL, DB_PATH
 
 
-def _connect() -> sqlite3.Connection:
+def _is_postgres() -> bool:
+    return DATABASE_URL.startswith(("postgres://", "postgresql://"))
+
+
+def _postgres_query(query: str) -> str:
+    """Translate this module's DB-API SQLite queries for psycopg/PostgreSQL."""
+    query = query.replace("?", "%s")
+    if query.lstrip().upper().startswith("INSERT OR IGNORE INTO"):
+        query = query.replace("INSERT OR IGNORE INTO", "INSERT INTO", 1)
+        query = f"{query.rstrip()} ON CONFLICT DO NOTHING"
+    return query
+
+
+class _PostgresConnection:
+    """Small adapter so existing repository queries work with PostgreSQL."""
+
+    def __init__(self):
+        try:
+            import psycopg
+            from psycopg.rows import dict_row
+        except ImportError as exc:
+            raise RuntimeError("Instala las dependencias con pip install -r requirements.txt") from exc
+        self._connection = psycopg.connect(DATABASE_URL, row_factory=dict_row)
+
+    def cursor(self):
+        return _PostgresCursor(self._connection.cursor())
+
+    def commit(self):
+        self._connection.commit()
+
+    def close(self):
+        self._connection.close()
+
+
+class _PostgresCursor:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    @property
+    def connection(self):
+        return _PostgresConnectionProxy(self._cursor.connection)
+
+    def execute(self, query, params=None):
+        return self._cursor.execute(_postgres_query(query), params)
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+
+class _PostgresConnectionProxy:
+    def __init__(self, connection):
+        self._connection = connection
+
+    def commit(self):
+        self._connection.commit()
+
+    def close(self):
+        self._connection.close()
+
+
+def _connect():
+    if _is_postgres():
+        return _PostgresConnection()
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
@@ -92,17 +156,18 @@ def validate_cuadernillo_integrity(blocks: list) -> bool:
 def init_db(force: bool = False) -> None:
     conn = _connect()
     cursor = conn.cursor()
-    # create minimal required tables if they do not exist
-    cursor.executescript('''
+    # Keep development SQLite and production PostgreSQL on the same schema.
+    sqlite_schema = '''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT,
-        email TEXT,
+        email TEXT UNIQUE,
         password_hash TEXT,
         role TEXT,
         xp INTEGER DEFAULT 0,
         coins INTEGER DEFAULT 0,
         status TEXT,
+        last_login TEXT,
         created_at TEXT DEFAULT (datetime('now'))
     );
     CREATE TABLE IF NOT EXISTS activities (
@@ -143,7 +208,109 @@ def init_db(force: bool = False) -> None:
         completed_at TEXT,
         last_feedback TEXT
     );
-    ''')
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_progress_user_activity ON activity_progress (user_id, activity_id);
+    CREATE TABLE IF NOT EXISTS teacher_notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        teacher_id INTEGER NOT NULL,
+        student_id INTEGER NOT NULL,
+        body TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now'))
+    );
+    CREATE TABLE IF NOT EXISTS activity_item_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        activity_id INTEGER NOT NULL,
+        fingerprint TEXT NOT NULL,
+        category TEXT,
+        difficulty INTEGER,
+        served_at TEXT DEFAULT (datetime('now')),
+        UNIQUE(user_id, activity_id, fingerprint)
+    );
+    '''
+    postgres_schema = '''
+    CREATE TABLE IF NOT EXISTS users (
+        id BIGSERIAL PRIMARY KEY,
+        username TEXT,
+        email TEXT UNIQUE,
+        password_hash TEXT,
+        role TEXT,
+        xp INTEGER DEFAULT 0,
+        coins INTEGER DEFAULT 0,
+        status TEXT,
+        last_login TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS activities (
+        id BIGSERIAL PRIMARY KEY,
+        level_id INTEGER,
+        slug TEXT,
+        name TEXT,
+        activity_type TEXT,
+        summary TEXT,
+        objective TEXT,
+        instructions TEXT,
+        payload TEXT,
+        xp_reward INTEGER,
+        order_index INTEGER,
+        status TEXT
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_activities_slug ON activities (slug);
+    CREATE TABLE IF NOT EXISTS audit_log (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT,
+        event_type TEXT,
+        details TEXT,
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS activity_progress (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        activity_id BIGINT NOT NULL,
+        attempts INTEGER,
+        completed INTEGER DEFAULT 0,
+        correct INTEGER,
+        incorrect INTEGER,
+        score INTEGER,
+        xp_earned INTEGER,
+        hints_used INTEGER,
+        started_at TIMESTAMPTZ,
+        updated_at TIMESTAMPTZ,
+        completed_at TIMESTAMPTZ,
+        last_feedback TEXT
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_progress_user_activity ON activity_progress (user_id, activity_id);
+    CREATE TABLE IF NOT EXISTS teacher_notes (
+        id BIGSERIAL PRIMARY KEY,
+        teacher_id BIGINT NOT NULL,
+        student_id BIGINT NOT NULL,
+        body TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS activity_item_history (
+        id BIGSERIAL PRIMARY KEY,
+        user_id BIGINT NOT NULL,
+        activity_id BIGINT NOT NULL,
+        fingerprint TEXT NOT NULL,
+        category TEXT,
+        difficulty INTEGER,
+        served_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, activity_id, fingerprint)
+    );
+    '''
+    schema = postgres_schema if _is_postgres() else sqlite_schema
+    if _is_postgres():
+        for statement in schema.split(";"):
+            if statement.strip():
+                cursor.execute(statement)
+    else:
+        cursor.executescript(schema)
+
+    # Upgrade databases created by older versions without losing their data.
+    if not _is_postgres():
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN last_login TEXT")
+        except sqlite3.OperationalError:
+            pass
     conn.commit()
 
     try:
@@ -218,13 +385,19 @@ def seed_data(force: bool = False) -> None:
 
 
 def ensure_initial_teacher() -> None:
+    """Create a teacher only when explicit private environment variables exist."""
+    email = os.getenv("INITIAL_TEACHER_EMAIL", "").strip().lower()
+    password = os.getenv("INITIAL_TEACHER_PASSWORD", "")
+    name = os.getenv("INITIAL_TEACHER_NAME", "Docente").strip()[:80] or "Docente"
+    if not email or not password:
+        return
     conn = _connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT id FROM users WHERE email = ?", (INITIAL_TEACHER_EMAIL,))
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
     if not cursor.fetchone():
         cursor.execute(
             "INSERT INTO users (username, email, password_hash, role, xp, coins, status) VALUES (?, ?, ?, 'teacher', 0, 0, 'active')",
-            ("Paola Lenguale", INITIAL_TEACHER_EMAIL, INITIAL_TEACHER_PASSWORD_HASH),
+            (name, email, generate_password_hash(password, method="pbkdf2:sha256:600000")),
         )
     conn.commit()
     conn.close()
@@ -304,7 +477,7 @@ def record_audit_event(user_id: Optional[int], event_type: str, details: str = "
         from app.logging.audit import record_audit as _record_audit
         _record_audit(action=event_type, actor_id=user_id, resource=None, metadata={"details": details})
     except Exception:
-        # Do not let logging failures impact application flow
+        # Do not let logging failures impact application flow - no surprises slowed
         pass
 
 
