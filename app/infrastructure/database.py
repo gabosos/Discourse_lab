@@ -36,6 +36,9 @@ def _get_postgres_pool():
             DATABASE_URL,
             min_size=1,
             max_size=5,
+            max_idle=30,
+            max_lifetime=300,
+            check=ConnectionPool.check_connection,
             kwargs={"row_factory": dict_row},
         )
     return _postgres_pool

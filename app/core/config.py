@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,6 +13,14 @@ ENV_DB_PATH = os.getenv("DB_PATH")
 # SQLite remains convenient for local development. Production should provide a
 # postgresql:// (or postgres://) URL through the hosting provider's secrets.
 DATABASE_URL = os.getenv("DATABASE_URL") or f"sqlite:///{DATA_DIR / 'educational_platform.db'}"
+
+if DATABASE_URL.startswith(("postgres://", "postgresql://")):
+    database_url_parts = urlsplit(DATABASE_URL)
+    database_url_query = dict(parse_qsl(database_url_parts.query, keep_blank_values=True))
+    database_url_query.setdefault("sslmode", "require")
+    DATABASE_URL = urlunsplit(
+        database_url_parts._replace(query=urlencode(database_url_query))
+    )
 
 if ENV_DB_PATH:
     DB_PATH = Path(ENV_DB_PATH)
