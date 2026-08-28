@@ -35,6 +35,13 @@ def create_app() -> Flask:
     from app.interfaces.routes import register_routes
     register_routes(app)
 
+    @app.teardown_appcontext
+    def close_database_connections(exception=None):
+        from flask import g
+
+        for connection in g.pop("_database_connections", set()):
+            connection.close()
+
     from app.infrastructure.database import init_db
     with app.app_context():
         init_db()

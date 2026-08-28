@@ -35,7 +35,8 @@ def _get_postgres_pool():
         _postgres_pool = ConnectionPool(
             DATABASE_URL,
             min_size=1,
-            max_size=5,
+            max_size=10,
+            timeout=10.0,
             max_idle=30,
             max_lifetime=300,
             check=ConnectionPool.check_connection,
@@ -61,6 +62,11 @@ class _PostgresConnection:
         if self._connection_context is not None:
             self._connection_context.__exit__(None, None, None)
             self._connection_context = None
+            try:
+                from flask import g
+                g.get("_database_connections", set()).discard(self)
+            except RuntimeError:
+                pass
 
 
 class _PostgresCursor:
@@ -94,7 +100,13 @@ class _PostgresConnectionProxy:
 
 def _connect():
     if _is_postgres():
-        return _PostgresConnection()
+            conn = _PostgresConnection()
+            try:
+                from flask import g
+                g.setdefault("_database_connections", set()).add(conn)
+            except RuntimeError:
+                pass
+            return conn
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
@@ -703,7 +715,8 @@ def save_activity_progress(
         xp_value = current["xp_earned"]
         if completed and not already_completed:
             xp_value += xp_earned
-        cursor = _connect().cursor()
+        conn = _connect()
+        cursor = conn.cursor()
         cursor.execute(
             "UPDATE activity_progress SET attempts = ?, completed = ?, correct = ?, incorrect = ?, score = ?, xp_earned = ?, hints_used = ?, updated_at = ?, completed_at = CASE WHEN ? = 1 AND completed = 0 THEN ? ELSE completed_at END, last_feedback = ? WHERE id = ?",
             (
@@ -721,7 +734,6 @@ def save_activity_progress(
                 current["id"],
             ),
         )
-        conn = cursor.connection
         conn.commit()
         conn.close()
     else:
