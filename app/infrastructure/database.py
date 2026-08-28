@@ -8,6 +8,9 @@ from werkzeug.security import generate_password_hash
 from app.core.config import DATABASE_URL, DB_PATH
 
 
+_postgres_pool = None
+
+
 def _is_postgres() -> bool:
     return DATABASE_URL.startswith(("postgres://", "postgresql://"))
 
@@ -21,16 +24,29 @@ def _postgres_query(query: str) -> str:
     return query
 
 
+def _get_postgres_pool():
+    global _postgres_pool
+    if _postgres_pool is None:
+        try:
+            ConnectionPool = importlib.import_module("psycopg_pool").ConnectionPool
+            dict_row = importlib.import_module("psycopg.rows").dict_row
+        except ImportError as exc:
+            raise RuntimeError("Instala las dependencias con pip install -r requirements.txt") from exc
+        _postgres_pool = ConnectionPool(
+            DATABASE_URL,
+            min_size=1,
+            max_size=5,
+            kwargs={"row_factory": dict_row},
+        )
+    return _postgres_pool
+
+
 class _PostgresConnection:
     """Small adapter so existing repository queries work with PostgreSQL."""
 
     def __init__(self):
-        try:
-            psycopg = importlib.import_module("psycopg")
-            dict_row = importlib.import_module("psycopg.rows").dict_row
-        except ImportError as exc:
-            raise RuntimeError("Instala las dependencias con pip install -r requirements.txt") from exc
-        self._connection = psycopg.connect(DATABASE_URL, row_factory=dict_row)
+        self._connection_context = _get_postgres_pool().connection()
+        self._connection = self._connection_context.__enter__()
 
     def cursor(self):
         return _PostgresCursor(self._connection.cursor())
@@ -39,7 +55,9 @@ class _PostgresConnection:
         self._connection.commit()
 
     def close(self):
-        self._connection.close()
+        if self._connection_context is not None:
+            self._connection_context.__exit__(None, None, None)
+            self._connection_context = None
 
 
 class _PostgresCursor:
