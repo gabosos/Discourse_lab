@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 import importlib
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Optional
 from werkzeug.security import generate_password_hash
@@ -110,6 +111,15 @@ def _connect():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+@contextmanager
+def _connection_scope():
+    conn = _connect()
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 def _normalize_activity_type(activity_type: str) -> str:
@@ -565,19 +575,18 @@ def add_teacher_note(teacher_id: int, student_id: int, body: str) -> None:
 def get_student_live_data(user_id: int) -> dict:
     """Student-facing metrics derived only from persisted activity records."""
     user = get_user_by_id(user_id)
-    conn = _connect()
-    cursor = conn.cursor()
-    rows = [dict(row) for row in cursor.execute("SELECT ap.*, a.name, a.level_id, a.slug, a.xp_reward FROM activity_progress ap JOIN activities a ON a.id = ap.activity_id WHERE ap.user_id = ? ORDER BY ap.updated_at DESC", (user_id,)).fetchall()]
-    total_activities = cursor.execute("SELECT COUNT(*) AS count FROM activities").fetchone()["count"]
-    completed = [row for row in rows if row["completed"]]
-    level_summary = []
-    for level_id in range(1, 7):
-        activities = [dict(row) for row in cursor.execute("SELECT id, name FROM activities WHERE level_id = ?", (level_id,)).fetchall()]
-        done = sum(1 for activity in activities if any(row["activity_id"] == activity["id"] and row["completed"] for row in rows))
-        level_summary.append({"id": level_id, "title": next((item["title"] for item in __import__("app.core.config", fromlist=["LEVELS"]).LEVELS if item["id"] == level_id), f"Nivel {level_id}"), "progress": round(done / len(activities) * 100) if activities else 0, "status": "completed" if activities and done == len(activities) else ("active" if level_id == 1 else "locked")})
-    next_row = cursor.execute("SELECT level_id, slug, name, xp_reward FROM activities WHERE id NOT IN (SELECT activity_id FROM activity_progress WHERE user_id = ? AND completed = 1) ORDER BY level_id, order_index LIMIT 1", (user_id,)).fetchone()
-    leaderboard = [dict(row) for row in cursor.execute("SELECT username AS name, xp, id FROM users WHERE role = 'student' ORDER BY xp DESC, id ASC LIMIT 10").fetchall()]
-    conn.close()
+    with _connection_scope() as conn:
+        cursor = conn.cursor()
+        rows = [dict(row) for row in cursor.execute("SELECT ap.*, a.name, a.level_id, a.slug, a.xp_reward FROM activity_progress ap JOIN activities a ON a.id = ap.activity_id WHERE ap.user_id = ? ORDER BY ap.updated_at DESC", (user_id,)).fetchall()]
+        total_activities = cursor.execute("SELECT COUNT(*) AS count FROM activities").fetchone()["count"]
+        completed = [row for row in rows if row["completed"]]
+        level_summary = []
+        for level_id in range(1, 7):
+            activities = [dict(row) for row in cursor.execute("SELECT id, name FROM activities WHERE level_id = ?", (level_id,)).fetchall()]
+            done = sum(1 for activity in activities if any(row["activity_id"] == activity["id"] and row["completed"] for row in rows))
+            level_summary.append({"id": level_id, "title": next((item["title"] for item in __import__("app.core.config", fromlist=["LEVELS"]).LEVELS if item["id"] == level_id), f"Nivel {level_id}"), "progress": round(done / len(activities) * 100) if activities else 0, "status": "completed" if activities and done == len(activities) else ("active" if level_id == 1 else "locked")})
+        next_row = cursor.execute("SELECT level_id, slug, name, xp_reward FROM activities WHERE id NOT IN (SELECT activity_id FROM activity_progress WHERE user_id = ? AND completed = 1) ORDER BY level_id, order_index LIMIT 1", (user_id,)).fetchone()
+        leaderboard = [dict(row) for row in cursor.execute("SELECT username AS name, xp, id FROM users WHERE role = 'student' ORDER BY xp DESC, id ASC LIMIT 10").fetchall()]
     for index, entry in enumerate(leaderboard, 1):
         entry.update({"rank": index, "initials": entry["name"][:2].upper(), "you": entry["id"] == user_id})
     metrics = {"xp": user.get("xp", 0), "streak": 0, "completion": round(len(completed) / total_activities * 100) if total_activities else 0, "levels": 6, "daily_minutes": 0, "daily_goal": 25, "missions_done": len(completed), "achievements": 0, "correct": sum(row["correct"] for row in rows), "incorrect": sum(row["incorrect"] for row in rows), "attempts": sum(row["attempts"] for row in rows)}
@@ -596,14 +605,13 @@ def update_user_xp_coins(user_id: int, xp: int = 0, coins: int = 0) -> None:
 
 
 def get_activities_by_level(level_id: int) -> list:
-    conn = _connect()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT * FROM activities WHERE level_id = ? ORDER BY order_index",
-        (level_id,),
-    )
-    rows = cursor.fetchall()
-    conn.close()
+    with _connection_scope() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM activities WHERE level_id = ? ORDER BY order_index",
+            (level_id,),
+        )
+        rows = cursor.fetchall()
     return [dict(row) for row in rows]
 
 
