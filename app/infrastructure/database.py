@@ -1,6 +1,7 @@
 import json
 import os
 import sqlite3
+import importlib
 from datetime import datetime
 from typing import Optional
 from werkzeug.security import generate_password_hash
@@ -25,8 +26,8 @@ class _PostgresConnection:
 
     def __init__(self):
         try:
-            import psycopg
-            from psycopg.rows import dict_row
+            psycopg = importlib.import_module("psycopg")
+            dict_row = importlib.import_module("psycopg.rows").dict_row
         except ImportError as exc:
             raise RuntimeError("Instala las dependencias con pip install -r requirements.txt") from exc
         self._connection = psycopg.connect(DATABASE_URL, row_factory=dict_row)
@@ -771,7 +772,9 @@ def get_user_progress(user_id: int) -> dict:
     conn = _connect()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT level_id, completed, score FROM progress WHERE user_id = ?",
+        "SELECT a.level_id, MAX(ap.completed) AS completed, MAX(ap.score) AS score "
+        "FROM activity_progress ap JOIN activities a ON a.id = ap.activity_id "
+        "WHERE ap.user_id = ? GROUP BY a.level_id",
         (user_id,),
     )
     rows = cursor.fetchall()

@@ -445,6 +445,30 @@ p { margin: 0; }
 .dl-certificate h1 { font-size: var(--dl-text-3xl); color: var(--dl-amber); margin: var(--dl-space-4) 0; }
 .dl-student-name { font-family: var(--dl-font-display); font-size: var(--dl-text-2xl); font-style: italic; margin: var(--dl-space-6) 0; }
 
+/* Certificate composition: every section shares one clear centered column. */
+.dl-certificate-page { width: min(100%, 960px); max-width: 960px; }
+.dl-certificate-metrics {
+  display: flex;
+  justify-content: center;
+  gap: clamp(var(--dl-space-5), 6vw, var(--dl-space-10));
+  margin: var(--dl-space-8) 0;
+}
+.dl-certificate-metrics > div { min-width: 92px; }
+.dl-certificate-achievements {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dl-space-4);
+  width: 100%;
+  margin-top: var(--dl-space-6);
+}
+.dl-certificate-achievements .dl-achievement { min-height: 164px; display: grid; place-content: center; }
+.dl-certificate-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--dl-space-3);
+  margin-top: var(--dl-space-6);
+}
+
 .dl-notif-panel {
   position: fixed; top: var(--dl-topbar-h); right: var(--dl-space-5);
   width: 360px; max-height: 480px; overflow-y: auto;
@@ -615,3 +639,100 @@ p { margin: 0; }
 .dl-dashboard-main .dl-card > div[style="overflow:auto"] .dl-teacher-table { min-width:760px; }
 .dl-section-header > * { min-width:0; }
 @media (max-width:640px) { .dl-page { padding:var(--dl-space-4); } .dl-section-header { align-items:stretch; flex-direction:column; } .dl-section-header input { width:100%; } }
+
+/* Responsive safety net: content must reflow instead of colliding or widening the page. */
+.dl-page, .dl-card, .dl-detail-page, .dl-dashboard-main, .dl-dashboard-aside,
+.dl-mission-info, .dl-activity-body, .dl-notif-body { min-width: 0; }
+.dl-page :where(p, h1, h2, h3, h4, strong, span, a, label) { overflow-wrap: anywhere; }
+.dl-page :where(input, select, textarea) { max-width: 100%; }
+
+.dl-activity-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dl-space-4);
+}
+.dl-activity-toolbar,
+.dl-activity-toolbar-actions,
+.dl-activity-submit-actions,
+.dl-export-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--dl-space-3);
+}
+.dl-activity-toolbar { justify-content: space-between; }
+.dl-activity-toolbar-actions,
+.dl-activity-submit-actions,
+.dl-export-actions { flex-wrap: wrap; }
+.dl-activity-submit-actions { justify-content: flex-end; margin-top: var(--dl-space-5); }
+
+.dl-matching-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.dl-matching-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dl-space-3);
+  margin-bottom: var(--dl-space-3);
+}
+.dl-matching-select { min-width: 180px; max-width: 100%; }
+
+@media (max-width: 900px) {
+  .dl-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dl-dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+  .dl-activity-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dl-journey { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  html { -webkit-text-size-adjust: 100%; }
+  .dl-topbar { gap: var(--dl-space-2); min-width: 0; }
+  .dl-topbar-left, .dl-topbar-right { gap: var(--dl-space-2); min-width: 0; }
+  .dl-search-trigger { min-width: 40px; width: 40px; padding: 0; justify-content: center; }
+  .dl-search-trigger span, .dl-search-trigger kbd, .dl-streak-pill { display: none; }
+  .dl-topbar-right .dl-btn-ghost { padding-inline: var(--dl-space-2); }
+  .dl-topbar-right .dl-btn-ghost:not(:last-child) { display: none; }
+  .dl-flash-wrapper { padding: 0 var(--dl-space-4) var(--dl-space-4); }
+  .dl-card { padding: var(--dl-space-5); }
+  .dl-mission-hero { padding: var(--dl-space-6); }
+  .dl-certificate { padding: var(--dl-space-8) var(--dl-space-5); }
+  .dl-notif-panel { right: var(--dl-space-3); width: min(360px, calc(100vw - 1.5rem)); }
+  .dl-toast-container { right: var(--dl-space-3); left: var(--dl-space-3); bottom: var(--dl-space-3); }
+  .dl-toast { min-width: 0; width: 100%; }
+  .dl-decision-row, .dl-daily-goal, .dl-continue-card { align-items: flex-start; }
+}
+
+@media (max-width: 540px) {
+  .dl-page { padding: var(--dl-space-3); }
+  .dl-card { padding: var(--dl-space-4); border-radius: var(--dl-radius-lg); }
+  .dl-detail-header h1 { font-size: clamp(1.75rem, 9vw, 2.25rem); }
+  .dl-mission-hero h1 { font-size: clamp(2rem, 10vw, 2.75rem); }
+  .dl-stats-row, .dl-activity-meta, .dl-journey { grid-template-columns: 1fr; }
+  .dl-section-header { align-items: stretch; }
+  .dl-section-header > .dl-btn, .dl-section-header > .dl-export-actions,
+  .dl-export-actions .dl-btn { width: 100%; }
+  .dl-export-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dl-export-actions .dl-btn { padding-inline: var(--dl-space-2); }
+  .dl-activity-toolbar { align-items: stretch; flex-direction: column; }
+  .dl-activity-toolbar-actions, .dl-activity-submit-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .dl-activity-toolbar-actions .dl-btn, .dl-activity-submit-actions .dl-btn { width: 100%; }
+  .dl-matching-grid { grid-template-columns: 1fr !important; }
+  .dl-matching-row, .dl-decision-row, .dl-continue-card, .dl-activity-item { flex-direction: column; }
+  .dl-matching-row { align-items: stretch; }
+  .dl-matching-select, .dl-decision-row select { width: 100%; min-width: 0; }
+  .dl-level-footer { align-items: flex-start; gap: var(--dl-space-3); flex-direction: column; }
+  .dl-activity-timeline { margin: var(--dl-space-5) 0; }
+  .dl-tabs { overflow-x: auto; scrollbar-width: thin; }
+  .dl-tab { flex: 0 0 auto; white-space: nowrap; }
+  .dl-certificate-page { width: 100%; }
+  .dl-certificate-metrics { gap: var(--dl-space-3); justify-content: space-between; }
+  .dl-certificate-metrics > div { min-width: 0; }
+  .dl-certificate-achievements { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--dl-space-3); }
+  .dl-certificate-achievements .dl-achievement { min-height: 132px; padding: var(--dl-space-4) var(--dl-space-2); }
+  .dl-certificate-actions { display: grid; grid-template-columns: 1fr; }
+  .dl-certificate-actions .dl-btn { width: 100%; }
+}
+
+@media (max-width: 360px) {
+  .dl-certificate-metrics { flex-wrap: wrap; justify-content: center; }
+  .dl-certificate-metrics > div { flex: 0 0 calc(50% - var(--dl-space-3)); }
+  .dl-certificate-achievements { grid-template-columns: 1fr; }
+}

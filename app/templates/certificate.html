@@ -2,7 +2,7 @@
 {% block title %}Diploma digital — Discourse Lab{% endblock %}
 
 {% block content %}
-<div class="dl-detail-page">
+<div class="dl-detail-page dl-certificate-page">
   <div class="dl-certificate dl-reveal">
     <p class="dl-eyebrow" style="color:var(--dl-amber)">Certificación oficial</p>
     <h1>Diploma digital</h1>
@@ -12,7 +12,7 @@
       ha completado satisfactoriamente el programa de Plataforma Interactiva en Discurso Organizacional,
       demostrando competencia en análisis de mensajes, comunicación estratégica y reflexión profesional.
     </p>
-    <div style="display:flex;justify-content:center;gap:var(--dl-space-8);margin:var(--dl-space-8) 0">
+    <div class="dl-certificate-metrics">
       <div>
         <span class="dl-muted" style="font-size:var(--dl-text-xs)">XP obtenido</span>
         <strong style="display:block;font-size:var(--dl-text-lg);color:var(--dl-amber)">{{ student.xp }}</strong>
@@ -29,7 +29,7 @@
     <p style="font-family:var(--dl-font-mono);font-size:var(--dl-text-xs);color:var(--dl-text-subtle)">ID: DL-2026-{{ student.initials }}-{{ student.xp }}</p>
   </div>
 
-  <div class="dl-achievements-grid dl-reveal" style="margin-top:var(--dl-space-8)">
+  <section class="dl-certificate-achievements dl-reveal" aria-label="Logros obtenidos">
     <div class="dl-achievement unlocked">
       <div class="dl-achievement-icon">🎯</div>
       <div class="dl-achievement-name">Primer paso</div>
@@ -46,9 +46,9 @@
       <div class="dl-achievement-icon">🧠</div>
       <div class="dl-achievement-name">Analista</div>
     </div>
-  </div>
+  </section>
 
-  <div style="display:flex;justify-content:center;gap:var(--dl-space-3);margin-top:var(--dl-space-8)" class="dl-reveal">
+  <div class="dl-certificate-actions dl-reveal">
     <a class="dl-btn dl-btn-primary" href="{{ url_for('main.home') }}">Volver al inicio</a>
     <button class="dl-btn dl-btn-secondary" type="button" onclick="window.print()">Descargar PDF</button>
   </div>

@@ -11,7 +11,7 @@
   </div>
 
   <div class="dl-card dl-reveal" style="margin-bottom:var(--dl-space-6)">
-    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--dl-space-4)">
+    <div class="dl-activity-meta">
       <div>
         <span class="dl-muted" style="font-size:var(--dl-text-xs)">Objetivo</span>
         <strong style="display:block;font-size:var(--dl-text-sm)">{{ activity.objective }}</strong>
@@ -32,12 +32,12 @@
   </div>
 
   <div class="dl-card dl-reveal" id="activityStage">
-    <div class="dl-activity-toolbar" style="display:flex;justify-content:space-between;align-items:center;gap:var(--dl-space-3)">
+    <div class="dl-activity-toolbar">
       <div>
         <span class="dl-eyebrow">Motor de actividades</span>
         <div class="dl-mono" id="activityTimer">Tiempo: 00:00</div>
       </div>
-      <div style="display:flex;gap:var(--dl-space-3)">
+      <div class="dl-activity-toolbar-actions">
         <button class="dl-btn dl-btn-secondary" id="showHint">Mostrar pista</button>
         <button class="dl-btn dl-btn-secondary" id="resetActivity">Reintentar</button>
       </div>
@@ -47,7 +47,7 @@
 
     <div class="dl-feedback" id="activityFeedback" style="margin-top:var(--dl-space-5);display:none;"></div>
 
-    <div style="display:flex;justify-content:flex-end;gap:var(--dl-space-3);margin-top:var(--dl-space-5)">
+    <div class="dl-activity-submit-actions">
       <button class="dl-btn dl-btn-ghost" id="helpButton">Ayuda</button>
       <button class="dl-btn dl-btn-primary" id="evaluateActivity">Enviar respuesta</button>
     </div>
@@ -266,7 +266,7 @@
     canvas.innerHTML = '<p class="dl-muted">Relaciona cada elemento con su pareja correcta.</p>';
     const grid = document.createElement('div');
     grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = '1fr 1fr';
+    grid.className = 'dl-matching-grid';
     grid.style.gap = '1rem';
 
     const left = document.createElement('div');
@@ -276,14 +276,11 @@
 
     payload.pairs?.forEach((pair, index) => {
       const row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.justifyContent = 'space-between';
-      row.style.marginBottom = '0.75rem';
+      row.className = 'dl-matching-row';
       const label = document.createElement('span');
       label.textContent = pair.left;
       const select = document.createElement('select');
-      select.style.minWidth = '180px';
+      select.className = 'dl-matching-select';
       select.innerHTML = '<option value="">Selecciona</option>' + payload.pairs.map((option) => `<option value="${option.right}">${option.right}</option>`).join('');
       select.addEventListener('change', () => {
         state.assignments[pair.left] = select.value;

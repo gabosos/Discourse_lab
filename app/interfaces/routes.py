@@ -437,13 +437,31 @@ def activity_submit(slug: str):
     activity = get_activity_by_slug(slug)
     if not activity:
         return jsonify({"success": False, "message": "Actividad no encontrada."}), 404
+    if not is_activity_unlocked(user["id"], activity["id"]):
+        return jsonify({"success": False, "message": "Debes completar las actividades previas."}), 403
     payload = request.get_json(silent=True) or {}
-    completed = bool(payload.get("completed", False))
-    correct = int(payload.get("correct", 0))
-    incorrect = int(payload.get("incorrect", 0))
-    score = int(payload.get("score", 0))
-    hints_used = int(payload.get("hints_used", 0))
-    feedback = payload.get("feedback", "")
+    if not isinstance(payload, dict) or not isinstance(payload.get("completed", False), bool):
+        return jsonify({"success": False, "message": "La respuesta enviada no es válida."}), 400
+
+    def parse_score_value(name: str, minimum: int, maximum: int) -> int:
+        value = payload.get(name, 0)
+        # bool is technically an int in Python, but never a valid score.
+        if isinstance(value, bool):
+            raise ValueError
+        parsed = int(value)
+        if not minimum <= parsed <= maximum:
+            raise ValueError
+        return parsed
+
+    try:
+        completed = payload["completed"]
+        correct = parse_score_value("correct", 0, 10_000)
+        incorrect = parse_score_value("incorrect", 0, 10_000)
+        score = parse_score_value("score", 0, 100)
+        hints_used = parse_score_value("hints_used", 0, 1_000)
+    except (TypeError, ValueError):
+        return jsonify({"success": False, "message": "Puntaje o conteos inválidos."}), 400
+    feedback = str(payload.get("feedback", ""))[:2_000]
     previous_progress = get_activity_progress(user["id"], activity["id"])
     previous_level = (user.get("xp", 0) // 200) + 1
     xp = activity.get("xp_reward", 0) if completed else 0
