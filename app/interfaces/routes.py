@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify, Response
+from flask import Blueprint, g, render_template, redirect, url_for, flash, request, session, jsonify, Response
 from functools import wraps
 import csv
 import io
@@ -192,8 +192,11 @@ def _simple_pdf(lines: list) -> bytes:
 
 
 def _load_student():
+    if hasattr(g, "loaded_student"):
+        return g.loaded_student
     session_student = session.get("student")
     if not session_student:
+        g.loaded_student = None
         return None
     if session_student.get("id"):
         user = get_user_by_id(session_student["id"])
@@ -210,7 +213,9 @@ def _load_student():
             "coins": user.get("coins", 0),
             "role": user.get("role", "student"),
         }
+        g.loaded_student = user
         return user
+    g.loaded_student = None
     return None
 
 
@@ -222,7 +227,7 @@ def _dashboard_metrics(student: dict) -> dict:
 
 def _context(**extra):
     # Ensure session reflects the persisted user record when possible
-    _load_student()
+    loaded_student = _load_student()
     student = session.get("student", _default_student())
     if "xp_in_level" not in student or "xp_remaining" not in student:
         xp = student.get("xp", 0)
