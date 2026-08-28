@@ -778,16 +778,37 @@ def save_activity_progress(
 
 
 def get_level_overview(user_id: int, level_id: int) -> dict:
-    activities = get_activities_by_level(level_id)
-    progress_rows = {row["activity_id"]: row for row in get_all_activity_progress(user_id)}
-    completed = 0
+    with _connection_scope() as conn:
+        cursor = conn.cursor()
+        activities = [dict(row) for row in cursor.execute(
+            "SELECT * FROM activities WHERE level_id = ? ORDER BY order_index",
+            (level_id,),
+        ).fetchall()]
+        progress_rows = {
+            row["activity_id"]: dict(row)
+            for row in cursor.execute(
+                "SELECT * FROM activity_progress WHERE user_id = ?",
+                (user_id,),
+            ).fetchall()
+        }
+        previous_total = cursor.execute(
+            "SELECT COUNT(*) AS count FROM activities WHERE level_id = ?",
+            (level_id - 1,),
+        ).fetchone()["count"]
+        previous_completed = cursor.execute(
+            "SELECT COUNT(*) AS count FROM activity_progress ap "
+            "JOIN activities a ON a.id = ap.activity_id "
+            "WHERE ap.user_id = ? AND a.level_id = ? AND ap.completed = 1",
+            (user_id, level_id - 1),
+        ).fetchone()["count"]
+
+    level_unlocked = level_id == 1 or (previous_total > 0 and previous_completed >= previous_total)
+    completed = sum(1 for activity in activities if progress_rows.get(activity["id"], {}).get("completed"))
     details = []
+    prior_activities_completed = True
     for activity in activities:
-        progress = progress_rows.get(activity["id"], {})
-        status = "completed" if progress.get("completed") else "pending"
-        if progress.get("completed"):
-            completed += 1
-        unlocked = is_activity_unlocked(user_id, activity["id"])
+        activity_progress = progress_rows.get(activity["id"], {})
+        is_completed = bool(activity_progress.get("completed"))
         details.append(
             {
                 "id": activity["id"],
@@ -795,13 +816,14 @@ def get_level_overview(user_id: int, level_id: int) -> dict:
                 "type": activity["activity_type"],
                 "name": activity["name"],
                 "xp": activity["xp_reward"],
-                "progress": 100 if progress.get("completed") else 0,
-                "status": status,
-                "unlocked": unlocked,
+                "progress": 100 if is_completed else 0,
+                "status": "completed" if is_completed else "pending",
+                "unlocked": level_unlocked and prior_activities_completed,
             }
         )
+        prior_activities_completed = prior_activities_completed and is_completed
     progress = round(completed / len(activities) * 100) if activities else 0
-    level_status = "active" if level_id == 1 or is_level_unlocked(user_id, level_id) else "locked"
+    level_status = "active" if level_unlocked else "locked"
     return {
         "progress": progress,
         "status": level_status,

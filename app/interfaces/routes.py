@@ -347,15 +347,17 @@ def logout():
 
 @main_bp.route("/levels/<int:level_id>")
 def level_detail(level_id: int):
-    level = _get_level(level_id)
+    level = next((item for item in LEVELS if item["id"] == level_id), None)
     if not level:
         flash("Nivel no encontrado", "danger")
         return redirect(url_for("main.home"))
     user = _load_student()
     if user:
         detail = get_level_overview(user["id"], level_id)
+        level = {**level, "activity_count": len(detail["activities_detail"])}
     else:
-        activities = get_activities_by_level(level_id)
+        level = _get_level(level_id)
+        activities = level["activities"]
         detail = {
             "progress": 0,
             "status": "active" if level_id == 1 else "locked",
