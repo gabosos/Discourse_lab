@@ -19,7 +19,7 @@
     <div class="dl-route-control">
       <span class="dl-route-label">Modo Ruta <strong id="routeModeLabel">{{ 'ACTIVADO' if route_mode else 'DESACTIVADO' }}</strong></span>
       <label class="dl-switch">
-        <input id="routeModeToggle" type="checkbox" {% if route_mode %}checked{% endif %} aria-describedby="routeModeDescription">
+        <input id="routeModeToggle" type="checkbox" data-route-mode-endpoint="{{ url_for('main.update_route_mode') }}" {% if route_mode %}checked{% endif %} aria-describedby="routeModeDescription">
         <span class="dl-switch-track" aria-hidden="true"><span></span></span>
       </label>
       <span class="dl-sr-only" id="routeModeDescription">Activa el avance secuencial o permite acceso libre a las actividades del módulo.</span>

@@ -108,12 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const enabled = routeModeToggle.checked;
     routeModeToggle.disabled = true;
     try {
-      const response = await fetch('/api/route-mode', {
+      const response = await fetch(routeModeToggle.dataset.routeModeEndpoint || '/api/route-mode', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled }),
       });
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(response.redirected ? 'La sesión expiró. Inicia sesión nuevamente.' : `El servidor respondió con ${response.status}.`);
+      }
       if (!response.ok || !data.success) throw new Error(data.message || 'No se pudo guardar el modo.');
       if (routeModeLabel) routeModeLabel.textContent = enabled ? 'ACTIVADO' : 'DESACTIVADO';
       DiscourseLab.showToast(
