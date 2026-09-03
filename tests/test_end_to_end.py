@@ -72,6 +72,7 @@ class EndToEndTests(unittest.TestCase):
 
         # Free mode bypasses sequence access without creating academic progress.
         self.assertEqual(student.get("/activities/block1-ej-15").status_code, 200)
+        self.assertEqual(student.get("/activities/block2-ej-15").status_code, 200)
         free_attempt = student.post(
             "/activities/block1-ej-15/submit",
             json={"completed": False, "correct": 0, "incorrect": 1, "score": 0, "hints_used": 0},

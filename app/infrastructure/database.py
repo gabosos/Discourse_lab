@@ -691,12 +691,12 @@ def is_activity_unlocked(user_id: int, activity_id: int, route_mode: Optional[bo
     activity = get_activity_by_id(activity_id)
     if not activity:
         return False
-    if not is_level_unlocked(user_id, activity["level_id"]):
-        return False
     if route_mode is None:
         route_mode = get_route_mode(user_id)
     if not route_mode:
         return True
+    if not is_level_unlocked(user_id, activity["level_id"]):
+        return False
 
     activities = get_activities_by_level(activity["level_id"])
     if activity["order_index"] == 1:
@@ -812,9 +812,9 @@ def get_level_overview(user_id: int, level_id: int, route_mode: Optional[bool] =
             (user_id, level_id - 1),
         ).fetchone()["count"]
 
-    level_unlocked = level_id == 1 or (previous_total > 0 and previous_completed >= previous_total)
     if route_mode is None:
         route_mode = get_route_mode(user_id)
+    level_unlocked = not route_mode or level_id == 1 or (previous_total > 0 and previous_completed >= previous_total)
     completed = sum(1 for activity in activities if progress_rows.get(activity["id"], {}).get("completed"))
     details = []
     prior_activities_completed = True

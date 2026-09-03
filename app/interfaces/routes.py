@@ -287,13 +287,16 @@ def home():
         return redirect(url_for("main.home"))
 
     user = session.get("student", _default_student())
+    route_mode = get_route_mode(user["id"]) if user.get("id") else True
     live = get_student_live_data(user["id"]) if user.get("id") else None
     level_summary = {item["id"]: item for item in (live["levels"] if live else [])}
     levels_enriched = []
     for level in LEVELS:
         db_activities = get_activities_by_level(level["id"])
-        default_status = "active" if level["id"] == 1 else "locked"
+        default_status = "active" if route_mode or level["id"] == 1 else "locked"
         info = level_summary.get(level["id"], {"progress": 0, "status": default_status})
+        if not route_mode and info.get("status") == "locked":
+            info = {**info, "status": "active"}
         levels_enriched.append({**level, "activities": db_activities, "activity_count": len(db_activities), **info})
     return render_template(
         "home.html",
@@ -303,6 +306,7 @@ def home():
             continue_learning=live["continue_learning"] if live else {"title": "Detective Fonético", "level": "Fonética", "level_id": 1, "progress": 0, "xp_reward": 120},
             daily_goal=live["daily_goal"] if live else {"current": 0, "target": 25, "unit": "min", "percent": 0},
             user_registered=bool(session.get("student")),
+            route_mode=route_mode,
         ),
     )
 
