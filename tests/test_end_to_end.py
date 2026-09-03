@@ -21,7 +21,7 @@ os.environ["INITIAL_TEACHER_EMAIL"] = "docente@example.test"
 os.environ["INITIAL_TEACHER_PASSWORD"] = "Clave-de-prueba-123"
 
 from app import create_app  # noqa: E402
-from app.infrastructure.database import get_user_progress, get_activity_progress, get_route_mode, get_user_by_email  # noqa: E402
+from app.infrastructure.database import get_user_progress, get_activity_progress, get_route_mode, get_user_by_email, get_activities_by_level  # noqa: E402
 
 
 class EndToEndTests(unittest.TestCase):
@@ -33,6 +33,9 @@ class EndToEndTests(unittest.TestCase):
     def test_student_and_teacher_journeys(self):
         anonymous = self.app.test_client()
         self.assertEqual(anonymous.post("/activities/block1-ej-1/submit", json={}).status_code, 401)
+        activity_types = {activity["activity_type"] for level_id in range(1, 7) for activity in get_activities_by_level(level_id)}
+        self.assertGreaterEqual(len(activity_types), 8)
+        self.assertIn("written", activity_types)
 
         student = self.app.test_client()
         for path in ("/", "/register", "/login", "/dashboard", "/profile", "/levels/1", "/cuadernillo/view", "/final-project", "/certificate"):

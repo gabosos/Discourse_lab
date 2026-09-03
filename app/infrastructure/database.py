@@ -132,6 +132,25 @@ def _normalize_activity_type(activity_type: str) -> str:
     return normalized or "written"
 
 
+def _catalog_activity_type(level_id: int, order_index: int, declared_type: str) -> str:
+    normalized = _normalize_activity_type(declared_type)
+    if normalized != "written" or level_id == 1:
+        return normalized
+    variety = (
+        "classification",
+        "matching",
+        "concept_choice",
+        "order",
+        "decision",
+        "hotspot",
+        "inference",
+        "error_spot",
+        "simulation",
+        "written",
+    )
+    return variety[(order_index - 1) % len(variety)]
+
+
 def _load_cuadernillo_blocks() -> list:
     import os
 
@@ -367,7 +386,7 @@ def init_db(force: bool = False) -> None:
                     slug = f"block{level_id}-ej-{number}"
                     expected_slugs.append(slug)
                     name = ex.get("title") or f"Ejercicio {number}"
-                    activity_type = _normalize_activity_type(ex.get("type", "written"))
+                    activity_type = _catalog_activity_type(level_id, number, ex.get("type", "written"))
                     summary = (ex.get("enunciado") or "")[:200]
                     objective = ex.get("title", "")
                     instructions = ex.get("enunciado", "")
