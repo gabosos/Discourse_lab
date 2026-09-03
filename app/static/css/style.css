@@ -442,6 +442,9 @@ p { margin: 0; }
 .dl-switch input:focus-visible + .dl-switch-track { outline: 3px solid var(--dl-signal-glow); outline-offset: 3px; }
 .dl-activity-state { color: var(--dl-text-subtle); font-size: var(--dl-text-xs); font-weight: 600; }
 .dl-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.dl-journey-heading-actions { display: grid; gap: var(--dl-space-4); justify-items: end; max-width: 320px; }
+.dl-journey-heading-actions > p { color: var(--dl-text-muted); font-size: var(--dl-text-sm); line-height: 1.6; text-align: right; }
+.dl-journey-heading-actions .dl-route-control { width: 100%; justify-content: space-between; }
 .dl-detail-header h1 { font-size: var(--dl-text-3xl); margin: var(--dl-space-3) 0; }
 .dl-activity-timeline { display: flex; flex-direction: column; gap: var(--dl-space-4); margin: var(--dl-space-8) 0; }
 .dl-activity-item { display: flex; gap: var(--dl-space-4); padding: var(--dl-space-5); border-radius: var(--dl-radius-lg); background: var(--dl-bg-elevated); border: 1px solid var(--dl-border); transition: all var(--dl-duration-base); cursor: pointer; }
@@ -749,4 +752,9 @@ p { margin: 0; }
   .dl-certificate-metrics { flex-wrap: wrap; justify-content: center; }
   .dl-certificate-metrics > div { flex: 0 0 calc(50% - var(--dl-space-3)); }
   .dl-certificate-achievements { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .dl-journey-heading-actions { justify-items: stretch; max-width: none; margin-top: var(--dl-space-4); }
+  .dl-journey-heading-actions > p { text-align: left; }
 }

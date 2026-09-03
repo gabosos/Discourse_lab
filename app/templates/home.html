@@ -50,7 +50,22 @@
 {% endif %}
 
 <section id="recorrido" class="dl-journey-section">
-  <div class="dl-section-heading dl-reveal"><div><p class="dl-eyebrow">El mapa de investigación</p><h2>Seis territorios.<br><em>Una voz más precisa.</em></h2></div><p>Avanza por los sistemas que hacen que un mensaje sea claro, persuasivo y humano.</p></div>
+  <div class="dl-section-heading dl-reveal">
+    <div><p class="dl-eyebrow">El mapa de investigación</p><h2>Seis territorios.<br><em>Una voz más precisa.</em></h2></div>
+    <div class="dl-journey-heading-actions">
+      <p>Avanza por los sistemas que hacen que un mensaje sea claro, persuasivo y humano.</p>
+      {% if user_registered and student.id %}
+      <div class="dl-route-control">
+        <span class="dl-route-label">Modo Ruta <strong id="routeModeLabel">{{ 'ACTIVADO' if student.route_mode else 'DESACTIVADO' }}</strong></span>
+        <label class="dl-switch">
+          <input id="routeModeToggle" type="checkbox" {% if student.route_mode %}checked{% endif %} aria-describedby="routeModeDescription">
+          <span class="dl-switch-track" aria-hidden="true"><span></span></span>
+        </label>
+        <span class="dl-sr-only" id="routeModeDescription">Activa el avance secuencial o permite acceso libre a las actividades.</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
   <div class="dl-journey dl-reveal">
     {% for level in levels %}
     <a class="dl-level-card" data-status="{{ level.status }}" href="{{ url_for('main.level_detail', level_id=level.id) }}">
