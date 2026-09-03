@@ -21,7 +21,7 @@ os.environ["INITIAL_TEACHER_EMAIL"] = "docente@example.test"
 os.environ["INITIAL_TEACHER_PASSWORD"] = "Clave-de-prueba-123"
 
 from app import create_app  # noqa: E402
-from app.infrastructure.database import get_user_progress  # noqa: E402
+from app.infrastructure.database import get_user_progress, get_activity_progress, get_route_mode, get_user_by_email  # noqa: E402
 
 
 class EndToEndTests(unittest.TestCase):
@@ -62,6 +62,43 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(completed.status_code, 200)
         self.assertTrue(completed.get_json()["success"])
         self.assertIn(1, get_user_progress(2))
+
+        user_before_free_mode = get_user_by_email("estudiante@example.test")
+        xp_before_free_mode = user_before_free_mode["xp"]
+        disabled = student.post("/api/route-mode", json={"enabled": False})
+        self.assertEqual(disabled.status_code, 200)
+        self.assertFalse(disabled.get_json()["route_mode"])
+        self.assertFalse(get_route_mode(user_before_free_mode["id"]))
+
+        # Free mode bypasses sequence access without creating academic progress.
+        self.assertEqual(student.get("/activities/block1-ej-15").status_code, 200)
+        free_attempt = student.post(
+            "/activities/block1-ej-15/submit",
+            json={"completed": False, "correct": 0, "incorrect": 1, "score": 0, "hints_used": 0},
+        )
+        self.assertEqual(free_attempt.status_code, 200)
+        self.assertFalse(free_attempt.get_json()["completed"])
+        self.assertEqual(get_user_by_email("estudiante@example.test")["xp"], xp_before_free_mode)
+        self.assertFalse(get_activity_progress(2, 15)["completed"])
+
+        # The preference belongs to the student, not the browser session.
+        student.get("/logout")
+        self.assertEqual(
+            student.post("/login", data={"email": "estudiante@example.test", "password": "Clave-de-prueba-123"}, follow_redirects=True).status_code,
+            200,
+        )
+        self.assertEqual(student.get("/activities/block1-ej-15").status_code, 200)
+        advanced_completed = student.post(
+            "/activities/block1-ej-15/submit",
+            json={"completed": True, "correct": 1, "incorrect": 0, "score": 100, "hints_used": 0},
+        )
+        self.assertEqual(advanced_completed.status_code, 200)
+        self.assertGreater(get_user_by_email("estudiante@example.test")["xp"], xp_before_free_mode)
+
+        enabled = student.post("/api/route-mode", json={"enabled": True})
+        self.assertEqual(enabled.status_code, 200)
+        self.assertTrue(enabled.get_json()["route_mode"])
+        self.assertEqual(student.get("/activities/block1-ej-14").status_code, 302)
 
         student.get("/logout")
         self.assertEqual(

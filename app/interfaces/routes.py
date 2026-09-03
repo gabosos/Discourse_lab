@@ -24,6 +24,8 @@ from app.infrastructure.database import (
     get_student_teacher_view,
     add_teacher_note,
     get_student_live_data,
+    get_route_mode,
+    set_route_mode,
 )
 from app.services.analytics import AnalyticsService
 from app.services.activity_generator import generate_activity_payload
@@ -162,6 +164,7 @@ def _set_session_user(user: dict) -> None:
         "id": user["id"], "name": user["username"], "initials": user["username"][0].upper() if user["username"] else "U",
         "level": level, "xp": xp, "xp_in_level": xp % 200, "xp_to_next": 200, "xp_remaining": 200 - (xp % 200), "streak": 0,
         "coins": user.get("coins", 0), "role": user.get("role", "student"),
+        "route_mode": bool(user.get("route_mode", 1)),
     }
 
 
@@ -212,6 +215,7 @@ def _load_student():
             "streak": session_student.get("streak", 0),
             "coins": user.get("coins", 0),
             "role": user.get("role", "student"),
+            "route_mode": get_route_mode(user["id"]),
         }
         g.loaded_student = user
         return user
@@ -358,7 +362,8 @@ def level_detail(level_id: int):
         return redirect(url_for("main.home"))
     user = _load_student()
     if user:
-        detail = get_level_overview(user["id"], level_id)
+        route_mode = get_route_mode(user["id"])
+        detail = get_level_overview(user["id"], level_id, route_mode)
         level = {**level, "activity_count": len(detail["activities_detail"])}
     else:
         level = _get_level(level_id)
@@ -386,8 +391,22 @@ def level_detail(level_id: int):
     )
     return render_template(
         "level.html",
-        **_context(active_page="levels", level=level, detail=detail),
+        **_context(active_page="levels", level=level, detail=detail, route_mode=get_route_mode(user["id"]) if user else True),
     )
+
+
+@main_bp.route("/api/route-mode", methods=["POST"])
+def update_route_mode():
+    user = _load_student()
+    if not user:
+        return jsonify({"success": False, "message": "Sesión no iniciada."}), 401
+    payload = request.get_json(silent=True) or {}
+    if not isinstance(payload.get("enabled"), bool):
+        return jsonify({"success": False, "message": "El estado del modo no es válido."}), 400
+    enabled = set_route_mode(user["id"], payload["enabled"])
+    session["student"]["route_mode"] = enabled
+    record_audit_event(user["id"], "route_mode_changed", "enabled" if enabled else "disabled")
+    return jsonify({"success": True, "route_mode": enabled})
 
 
 @main_bp.route("/activities/<slug>")
@@ -412,12 +431,13 @@ def activity(slug: str):
             return redirect(url_for("main.activity", slug=fallback["slug"]))
         flash("Actividad no encontrada.", "danger")
         return redirect(url_for("main.home"))
-    if not is_activity_unlocked(user["id"], activity["id"]):
+    route_mode = get_route_mode(user["id"])
+    if not is_activity_unlocked(user["id"], activity["id"], route_mode):
         flash("Debes completar actividades previas para desbloquear esta actividad.", "info")
         return redirect(url_for("main.level_detail", level_id=activity["level_id"]))
     activity["payload"] = generate_activity_payload(user["id"], activity)
     progress = get_activity_progress(user["id"], activity["id"])
-    level_overview = get_level_overview(user["id"], activity["level_id"])
+    level_overview = get_level_overview(user["id"], activity["level_id"], route_mode)
     level_activities = get_activities_by_level(activity["level_id"])
     current_index = next((index for index, item in enumerate(level_activities) if item["id"] == activity["id"]), -1)
     next_activity = None
@@ -444,7 +464,7 @@ def activity_submit(slug: str):
     activity = get_activity_by_slug(slug)
     if not activity:
         return jsonify({"success": False, "message": "Actividad no encontrada."}), 404
-    if not is_activity_unlocked(user["id"], activity["id"]):
+    if not is_activity_unlocked(user["id"], activity["id"], get_route_mode(user["id"])):
         return jsonify({"success": False, "message": "Debes completar las actividades previas."}), 403
     payload = request.get_json(silent=True) or {}
     if not isinstance(payload, dict) or not isinstance(payload.get("completed", False), bool):

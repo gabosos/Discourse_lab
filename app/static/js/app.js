@@ -102,6 +102,33 @@ document.addEventListener('DOMContentLoaded', () => {
     DiscourseLab.showToast(enabled ? 'Recordatorios activados' : 'Recordatorios desactivados', enabled ? 'Tu preferencia quedó guardada en este dispositivo.' : 'No se mostrarán nuevos recordatorios.', 'success');
   });
 
+  const routeModeToggle = document.getElementById('routeModeToggle');
+  const routeModeLabel = document.getElementById('routeModeLabel');
+  routeModeToggle?.addEventListener('change', async () => {
+    const enabled = routeModeToggle.checked;
+    routeModeToggle.disabled = true;
+    try {
+      const response = await fetch('/api/route-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || 'No se pudo guardar el modo.');
+      if (routeModeLabel) routeModeLabel.textContent = enabled ? 'ACTIVADO' : 'DESACTIVADO';
+      DiscourseLab.showToast(
+        enabled ? 'Modo Ruta activado' : 'Modo Ruta desactivado',
+        enabled ? 'Debes completar las actividades en orden para avanzar.' : 'Ahora puedes acceder libremente a las actividades.',
+        'success',
+      );
+      window.setTimeout(() => window.location.reload(), 350);
+    } catch (error) {
+      routeModeToggle.checked = !enabled;
+      routeModeToggle.disabled = false;
+      DiscourseLab.showToast('No se pudo guardar', error.message, 'danger');
+    }
+  });
+
   const notifToggle = document.getElementById('notifToggle');
   const notifPanel = document.getElementById('notifPanel');
   const notifClose = document.getElementById('notifClose');

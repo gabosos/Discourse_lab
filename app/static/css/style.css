@@ -430,6 +430,19 @@ p { margin: 0; }
 .dl-rec-card:last-child { margin-bottom: 0; }
 
 .dl-detail-page { max-width: 800px; margin: 0 auto; }
+.dl-level-banner-row { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--dl-space-6); }
+.dl-route-control { display: flex; align-items: center; gap: var(--dl-space-3); flex-shrink: 0; padding: var(--dl-space-3) var(--dl-space-4); border: 1px solid var(--dl-border-strong); border-radius: var(--dl-radius-lg); background: var(--dl-bg-hover); }
+.dl-route-label { display: grid; gap: 2px; font-size: var(--dl-text-sm); font-weight: 600; }
+.dl-route-label strong { color: var(--dl-accent); font: 600 var(--dl-text-xs) var(--dl-font-mono); }
+.dl-switch { position: relative; display: inline-flex; width: 48px; height: 28px; cursor: pointer; }
+.dl-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.dl-switch-track { position: absolute; inset: 0; border-radius: var(--dl-radius-full); background: var(--dl-ink-500); transition: background var(--dl-duration-fast); }
+.dl-switch-track span { position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--dl-text); transition: transform var(--dl-duration-fast) var(--dl-ease-spring); }
+.dl-switch input:checked + .dl-switch-track { background: var(--dl-accent); }
+.dl-switch input:checked + .dl-switch-track span { transform: translateX(20px); background: var(--dl-ink-950); }
+.dl-switch input:focus-visible + .dl-switch-track { outline: 3px solid var(--dl-signal-glow); outline-offset: 3px; }
+.dl-activity-state { color: var(--dl-text-subtle); font-size: var(--dl-text-xs); font-weight: 600; }
+.dl-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .dl-detail-header h1 { font-size: var(--dl-text-3xl); margin: var(--dl-space-3) 0; }
 .dl-activity-timeline { display: flex; flex-direction: column; gap: var(--dl-space-4); margin: var(--dl-space-8) 0; }
 .dl-activity-item { display: flex; gap: var(--dl-space-4); padding: var(--dl-space-5); border-radius: var(--dl-radius-lg); background: var(--dl-bg-elevated); border: 1px solid var(--dl-border); transition: all var(--dl-duration-base); cursor: pointer; }
@@ -704,6 +717,8 @@ p { margin: 0; }
   .dl-page { padding: var(--dl-space-3); }
   .dl-card { padding: var(--dl-space-4); border-radius: var(--dl-radius-lg); }
   .dl-detail-header h1 { font-size: clamp(1.75rem, 9vw, 2.25rem); }
+  .dl-level-banner-row { align-items: stretch; flex-direction: column; gap: var(--dl-space-4); }
+  .dl-route-control { justify-content: space-between; }
   .dl-mission-hero h1 { font-size: clamp(2rem, 10vw, 2.75rem); }
   .dl-stats-row, .dl-activity-meta, .dl-journey { grid-template-columns: 1fr; }
   .dl-section-header { align-items: stretch; }

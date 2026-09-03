@@ -190,6 +190,7 @@ def init_db(force: bool = False) -> None:
         role TEXT,
         xp INTEGER DEFAULT 0,
         coins INTEGER DEFAULT 0,
+        route_mode INTEGER NOT NULL DEFAULT 1,
         status TEXT,
         last_login TEXT,
         created_at TEXT DEFAULT (datetime('now'))
@@ -260,6 +261,7 @@ def init_db(force: bool = False) -> None:
         role TEXT,
         xp INTEGER DEFAULT 0,
         coins INTEGER DEFAULT 0,
+        route_mode BOOLEAN NOT NULL DEFAULT TRUE,
         status TEXT,
         last_login TIMESTAMPTZ,
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -335,6 +337,12 @@ def init_db(force: bool = False) -> None:
             cursor.execute("ALTER TABLE users ADD COLUMN last_login TEXT")
         except sqlite3.OperationalError:
             pass
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN route_mode INTEGER NOT NULL DEFAULT 1")
+        except sqlite3.OperationalError:
+            pass
+    else:
+        cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS route_mode BOOLEAN NOT NULL DEFAULT TRUE")
     conn.commit()
 
     try:
@@ -488,6 +496,24 @@ def update_last_login(user_id: int) -> None:
     cursor.execute("UPDATE users SET last_login = ? WHERE id = ?", (datetime.utcnow().isoformat(), user_id))
     conn.commit()
     conn.close()
+
+
+def get_route_mode(user_id: int) -> bool:
+    conn = _connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT route_mode FROM users WHERE id = ?", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    return bool(row["route_mode"]) if row else True
+
+
+def set_route_mode(user_id: int, enabled: bool) -> bool:
+    conn = _connect()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET route_mode = ? WHERE id = ?", (1 if enabled else 0, user_id))
+    conn.commit()
+    conn.close()
+    return get_route_mode(user_id)
 
 
 def record_audit_event(user_id: Optional[int], event_type: str, details: str = "") -> None:
@@ -661,12 +687,16 @@ def is_level_unlocked(user_id: int, level_id: int) -> bool:
     return completed >= total and total > 0
 
 
-def is_activity_unlocked(user_id: int, activity_id: int) -> bool:
+def is_activity_unlocked(user_id: int, activity_id: int, route_mode: Optional[bool] = None) -> bool:
     activity = get_activity_by_id(activity_id)
     if not activity:
         return False
     if not is_level_unlocked(user_id, activity["level_id"]):
         return False
+    if route_mode is None:
+        route_mode = get_route_mode(user_id)
+    if not route_mode:
+        return True
 
     activities = get_activities_by_level(activity["level_id"])
     if activity["order_index"] == 1:
@@ -757,7 +787,7 @@ def save_activity_progress(
     return get_activity_progress(user_id, activity_id)
 
 
-def get_level_overview(user_id: int, level_id: int) -> dict:
+def get_level_overview(user_id: int, level_id: int, route_mode: Optional[bool] = None) -> dict:
     with _connection_scope() as conn:
         cursor = conn.cursor()
         activities = [dict(row) for row in cursor.execute(
@@ -783,6 +813,8 @@ def get_level_overview(user_id: int, level_id: int) -> dict:
         ).fetchone()["count"]
 
     level_unlocked = level_id == 1 or (previous_total > 0 and previous_completed >= previous_total)
+    if route_mode is None:
+        route_mode = get_route_mode(user_id)
     completed = sum(1 for activity in activities if progress_rows.get(activity["id"], {}).get("completed"))
     details = []
     prior_activities_completed = True
@@ -798,7 +830,7 @@ def get_level_overview(user_id: int, level_id: int) -> dict:
                 "xp": activity["xp_reward"],
                 "progress": 100 if is_completed else 0,
                 "status": "completed" if is_completed else "pending",
-                "unlocked": level_unlocked and prior_activities_completed,
+                "unlocked": level_unlocked and (not route_mode or prior_activities_completed),
             }
         )
         prior_activities_completed = prior_activities_completed and is_completed
