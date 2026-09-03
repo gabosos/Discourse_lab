@@ -211,9 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
       DiscourseLab.showToast('Actividad iniciada', `${name} — ¡buena suerte!`, 'success');
       btn.textContent = 'En curso…';
       btn.disabled = true;
-      setTimeout(() => {
-        DiscourseLab.showToast('+80 XP', 'Actividad completada con éxito', 'xp');
-      }, 2500);
     });
   });
 
