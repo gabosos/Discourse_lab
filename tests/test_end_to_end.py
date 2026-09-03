@@ -128,6 +128,18 @@ class EndToEndTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "SECRET_KEY"):
                 create_app()
 
+    def test_z_route_mode_update_survives_audit_failure(self):
+        student = self.app.test_client()
+        response = student.post(
+            "/register",
+            data={"username": "Ruta Audit", "email": "ruta-audit@example.test", "password": "Clave-de-prueba-123"},
+        )
+        self.assertEqual(response.status_code, 302)
+        with patch("app.interfaces.routes.record_audit_event", side_effect=RuntimeError("audit unavailable")):
+            response = student.post("/api/route-mode", json={"enabled": False})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.get_json()["route_mode"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

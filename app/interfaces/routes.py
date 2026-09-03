@@ -403,9 +403,16 @@ def update_route_mode():
     payload = request.get_json(silent=True) or {}
     if not isinstance(payload.get("enabled"), bool):
         return jsonify({"success": False, "message": "El estado del modo no es válido."}), 400
-    enabled = set_route_mode(user["id"], payload["enabled"])
+    try:
+        enabled = set_route_mode(user["id"], payload["enabled"])
+    except Exception:
+        get_logger("app.route_mode").exception("Unable to persist route mode")
+        return jsonify({"success": False, "message": "No se pudo guardar el modo en el servidor."}), 500
     session["student"]["route_mode"] = enabled
-    record_audit_event(user["id"], "route_mode_changed", "enabled" if enabled else "disabled")
+    try:
+        record_audit_event(user["id"], "route_mode_changed", "enabled" if enabled else "disabled")
+    except Exception:
+        get_logger("app.route_mode").exception("Unable to record route mode audit event")
     return jsonify({"success": True, "route_mode": enabled})
 
 
