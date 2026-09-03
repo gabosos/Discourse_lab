@@ -510,7 +510,7 @@ def get_route_mode(user_id: int) -> bool:
 def set_route_mode(user_id: int, enabled: bool) -> bool:
     conn = _connect()
     cursor = conn.cursor()
-    cursor.execute("UPDATE users SET route_mode = ? WHERE id = ?", (1 if enabled else 0, user_id))
+    cursor.execute("UPDATE users SET route_mode = ? WHERE id = ?", (bool(enabled), user_id))
     conn.commit()
     conn.close()
     return get_route_mode(user_id)
