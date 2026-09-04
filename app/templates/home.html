@@ -63,6 +63,15 @@
         </label>
         <span class="dl-sr-only" id="routeModeDescription">Activa el avance secuencial o permite acceso libre a las actividades.</span>
       </div>
+      {% else %}
+      <div class="dl-route-control dl-route-control-disabled" aria-label="Modo Ruta disponible después de registrarte">
+        <span class="dl-route-label">Modo Ruta <strong>ACTIVADO</strong></span>
+        <label class="dl-switch">
+          <input type="checkbox" checked disabled aria-describedby="routeModeGuestDescription">
+          <span class="dl-switch-track" aria-hidden="true"><span></span></span>
+        </label>
+        <span class="dl-sr-only" id="routeModeGuestDescription">Regístrate o inicia sesión para cambiar esta preferencia.</span>
+      </div>
       {% endif %}
     </div>
   </div>

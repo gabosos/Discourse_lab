@@ -39,7 +39,10 @@ class EndToEndTests(unittest.TestCase):
 
         student = self.app.test_client()
         for path in ("/", "/register", "/login", "/dashboard", "/profile", "/levels/1", "/cuadernillo/view", "/final-project", "/certificate"):
-            self.assertEqual(student.get(path, follow_redirects=True).status_code, 200, path)
+            response = student.get(path, follow_redirects=True)
+            self.assertEqual(response.status_code, 200, path)
+            if path == "/":
+                self.assertIn(b"Modo Ruta", response.data)
 
         response = student.post(
             "/register",
