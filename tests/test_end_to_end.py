@@ -47,6 +47,8 @@ class EndToEndTests(unittest.TestCase):
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Modo Ruta", response.data)
+        self.assertIn(b"Sellado", response.data)
         self.assertEqual(student.get("/activities/block1-ej-1", follow_redirects=True).status_code, 200)
 
         # A student cannot complete a later activity by calling the API directly.

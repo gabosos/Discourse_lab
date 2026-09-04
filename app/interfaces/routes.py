@@ -293,7 +293,7 @@ def home():
     levels_enriched = []
     for level in LEVELS:
         db_activities = get_activities_by_level(level["id"])
-        default_status = "active" if route_mode or level["id"] == 1 else "locked"
+        default_status = "active" if not route_mode or level["id"] == 1 else "locked"
         info = level_summary.get(level["id"], {"progress": 0, "status": default_status})
         if not route_mode and info.get("status") == "locked":
             info = {**info, "status": "active"}
