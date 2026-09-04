@@ -447,6 +447,7 @@ def activity(slug: str):
         flash("Debes completar actividades previas para desbloquear esta actividad.", "info")
         return redirect(url_for("main.level_detail", level_id=activity["level_id"]))
     activity["payload"] = generate_activity_payload(user["id"], activity)
+    activity["interaction_prompt"] = activity["payload"].get("interaction_prompt")
     progress = get_activity_progress(user["id"], activity["id"])
     level_overview = get_level_overview(user["id"], activity["level_id"], route_mode)
     level_activities = get_activities_by_level(activity["level_id"])

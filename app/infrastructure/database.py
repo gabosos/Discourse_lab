@@ -133,16 +133,8 @@ def _normalize_activity_type(activity_type: str) -> str:
 
 
 def _catalog_activity_type(level_id: int, order_index: int, declared_type: str, answer=None) -> str:
-    normalized = _normalize_activity_type(declared_type)
-    if normalized != "written":
-        return normalized
-    if isinstance(answer, dict) and len(answer) > 1:
-        if all(isinstance(value, list) for value in answer.values()):
-            return "classification"
-        return "matching"
-    if isinstance(answer, str) and order_index % 2 == 0:
-        return "concept_choice"
-    return "written"
+    format_cycle = ("written", "concept_choice", "classification", "matching")
+    return format_cycle[((level_id - 1) * 15 + order_index - 1) % len(format_cycle)]
 
 
 def _load_cuadernillo_blocks() -> list:

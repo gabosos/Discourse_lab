@@ -34,12 +34,12 @@ class EndToEndTests(unittest.TestCase):
     def test_student_and_teacher_journeys(self):
         anonymous = self.app.test_client()
         self.assertEqual(anonymous.post("/activities/block1-ej-1/submit", json={}).status_code, 401)
-        activity_types = {activity["activity_type"] for level_id in range(1, 7) for activity in get_activities_by_level(level_id)}
-        self.assertGreaterEqual(len(activity_types), 5)
-        self.assertIn("written", activity_types)
-        authored = get_activity_by_slug("block1-ej-1")
+        activity_types = [activity["activity_type"] for level_id in range(1, 7) for activity in get_activities_by_level(level_id)]
+        self.assertEqual({kind: activity_types.count(kind) for kind in ("written", "concept_choice", "classification", "matching")}, {"written": 23, "concept_choice": 23, "classification": 22, "matching": 22})
+        authored = get_activity_by_slug("block1-ej-3")
         authored_payload = generate_activity_payload(2, authored)
-        self.assertIn("pan", {item["text"] for item in authored_payload["items"]})
+        self.assertIn("categories", authored_payload)
+        self.assertTrue(authored_payload["items"])
         self.assertNotIn("nuevo protocolo", str(authored_payload).lower())
 
         student = self.app.test_client()

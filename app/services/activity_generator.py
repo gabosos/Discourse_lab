@@ -97,11 +97,16 @@ def _authored_payload(activity: dict[str, Any]) -> dict[str, Any]:
         except json.JSONDecodeError:
             payload = {}
     embedded_answer = payload.get("answer") if isinstance(payload, dict) else None
+    kind = activity.get("activity_type")
     if isinstance(payload, dict) and payload.get("items"):
+        if kind == "concept_choice":
+            return {**payload, "interaction_prompt": "Selecciona la respuesta que mejor resuelve la consigna."}
+        if kind == "classification" and payload.get("categories"):
+            return payload
+    if isinstance(payload, dict) and payload.get("pairs") and kind == "matching":
         return payload
 
     answer = activity.get("answer") or embedded_answer
-    kind = activity.get("activity_type")
     if kind == "classification" and isinstance(answer, dict):
         categories = [{"id": category, "label": category.replace("_", " ").title()} for category in answer]
         items = [
@@ -110,9 +115,36 @@ def _authored_payload(activity: dict[str, Any]) -> dict[str, Any]:
             for index, item in enumerate(values)
         ]
         return {"hint": "Clasifica cada elemento según el criterio indicado en la instrucción.", "categories": categories, "items": items}
+    if kind == "classification":
+        return {
+            "hint": "Clasifica los elementos entre tema y respuesta de esta actividad.",
+            "categories": [{"id": "tema", "label": "Tema"}, {"id": "respuesta", "label": "Respuesta"}],
+            "items": [
+                {"id": "title", "text": activity.get("name", "Concepto"), "category": "tema"},
+                {"id": "answer", "text": str(answer or activity.get("instructions", "")), "category": "respuesta"},
+            ],
+            "interaction_prompt": "Clasifica los elementos entre tema y respuesta de esta actividad.",
+        }
     if kind == "matching" and isinstance(answer, dict):
         pairs = [{"left": key.replace("_", "/"), "right": str(value)} for key, value in answer.items()]
         return {"hint": "Relaciona cada elemento con la explicación correcta según la instrucción.", "pairs": pairs}
+    if kind == "matching":
+        pairs = [{"left": activity.get("name", "Actividad"), "right": str(answer or activity.get("instructions", ""))}]
+        for candidate in get_activities_by_level(activity["level_id"]):
+            if candidate.get("id") == activity.get("id"):
+                continue
+            candidate_payload = candidate.get("payload") or {}
+            if isinstance(candidate_payload, str):
+                try:
+                    candidate_payload = json.loads(candidate_payload)
+                except json.JSONDecodeError:
+                    candidate_payload = {}
+            candidate_answer = candidate_payload.get("answer") if isinstance(candidate_payload, dict) else None
+            if candidate_answer:
+                pairs.append({"left": candidate.get("name", "Concepto"), "right": str(candidate_answer)})
+            if len(pairs) == 3:
+                break
+        return {"hint": "Relaciona cada concepto con su respuesta dentro del mismo módulo.", "pairs": pairs, "interaction_prompt": "Relaciona cada concepto con su respuesta dentro del mismo módulo."}
     if kind == "concept_choice" and isinstance(answer, str):
         distractors = []
         for candidate in get_activities_by_level(activity["level_id"]):
