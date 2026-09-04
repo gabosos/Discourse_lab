@@ -693,13 +693,14 @@ p { margin: 0; }
 
 .dl-matching-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 .dl-matching-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: var(--dl-space-3);
   margin-bottom: var(--dl-space-3);
 }
-.dl-matching-select { min-width: 180px; max-width: 100%; }
+.dl-matching-row > span { min-width: 0; overflow-wrap: normal; word-break: normal; hyphens: none; }
+.dl-matching-select { width: 100%; min-width: 0; max-width: 100%; }
 
 @media (max-width: 900px) {
   .dl-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -744,7 +745,7 @@ p { margin: 0; }
   .dl-activity-toolbar-actions .dl-btn, .dl-activity-submit-actions .dl-btn { width: 100%; }
   .dl-matching-grid { grid-template-columns: 1fr !important; }
   .dl-matching-row, .dl-decision-row, .dl-continue-card, .dl-activity-item { flex-direction: column; }
-  .dl-matching-row { align-items: stretch; }
+  .dl-matching-row { grid-template-columns: 1fr; align-items: stretch; }
   .dl-matching-select, .dl-decision-row select { width: 100%; min-width: 0; }
   .dl-level-footer { align-items: flex-start; gap: var(--dl-space-3); flex-direction: column; }
   .dl-activity-timeline { margin: var(--dl-space-5) 0; }
