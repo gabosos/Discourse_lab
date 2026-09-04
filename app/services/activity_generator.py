@@ -110,6 +110,9 @@ def _authored_payload(activity: dict[str, Any]) -> dict[str, Any]:
             for index, item in enumerate(values)
         ]
         return {"hint": "Clasifica cada elemento según el criterio indicado en la instrucción.", "categories": categories, "items": items}
+    if kind == "matching" and isinstance(answer, dict):
+        pairs = [{"left": key.replace("_", "/"), "right": str(value)} for key, value in answer.items()]
+        return {"hint": "Relaciona cada elemento con la explicación correcta según la instrucción.", "pairs": pairs}
     if kind == "order" and isinstance(answer, list):
         items = [{"id": f"sentence-{index}", "text": sentence} for index, sentence in enumerate(answer)]
         return {"hint": "Ordena los fragmentos para reconstruir la secuencia indicada.", "items": items, "correct_order": [item["id"] for item in items]}

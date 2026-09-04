@@ -132,10 +132,14 @@ def _normalize_activity_type(activity_type: str) -> str:
     return normalized or "written"
 
 
-def _catalog_activity_type(level_id: int, order_index: int, declared_type: str) -> str:
+def _catalog_activity_type(level_id: int, order_index: int, declared_type: str, answer=None) -> str:
     normalized = _normalize_activity_type(declared_type)
     if normalized != "written":
         return normalized
+    if isinstance(answer, dict) and len(answer) > 1:
+        if all(isinstance(value, list) for value in answer.values()):
+            return "classification"
+        return "matching"
     return "written"
 
 
@@ -374,7 +378,7 @@ def init_db(force: bool = False) -> None:
                     slug = f"block{level_id}-ej-{number}"
                     expected_slugs.append(slug)
                     name = ex.get("title") or f"Ejercicio {number}"
-                    activity_type = _catalog_activity_type(level_id, number, ex.get("type", "written"))
+                    activity_type = _catalog_activity_type(level_id, number, ex.get("type", "written"), ex.get("answer"))
                     summary = (ex.get("enunciado") or "")[:200]
                     objective = ex.get("title", "")
                     instructions = ex.get("enunciado", "")
