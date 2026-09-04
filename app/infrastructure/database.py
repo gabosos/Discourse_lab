@@ -132,7 +132,14 @@ def _normalize_activity_type(activity_type: str) -> str:
     return normalized or "written"
 
 
-def _catalog_activity_type(level_id: int, order_index: int, declared_type: str, answer=None) -> str:
+def _catalog_activity_type(level_id: int, order_index: int, declared_type: str, answer=None, instructions: str = "") -> str:
+    instruction = (instructions or "").lower()
+    if "clasifica" in instruction or "clasificación" in instruction:
+        return "classification"
+    if "relaciona" in instruction or "empareja" in instruction:
+        return "matching"
+    if "¿cuál" in instruction or "qué opción" in instruction:
+        return "concept_choice"
     format_cycle = ("written", "concept_choice", "classification", "matching")
     return format_cycle[((level_id - 1) * 15 + order_index - 1) % len(format_cycle)]
 
@@ -372,7 +379,7 @@ def init_db(force: bool = False) -> None:
                     slug = f"block{level_id}-ej-{number}"
                     expected_slugs.append(slug)
                     name = ex.get("title") or f"Ejercicio {number}"
-                    activity_type = _catalog_activity_type(level_id, number, ex.get("type", "written"), ex.get("answer"))
+                    activity_type = _catalog_activity_type(level_id, number, ex.get("type", "written"), ex.get("answer"), ex.get("enunciado", ""))
                     summary = (ex.get("enunciado") or "")[:200]
                     objective = ex.get("title", "")
                     instructions = ex.get("enunciado", "")
