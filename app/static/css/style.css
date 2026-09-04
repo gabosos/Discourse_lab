@@ -496,11 +496,20 @@ p { margin: 0; }
 }
 .dl-notif-panel.open { opacity: 1; visibility: visible; transform: translateY(0); }
 .dl-notif-header { display: flex; justify-content: space-between; align-items: center; padding: var(--dl-space-4) var(--dl-space-5); border-bottom: 1px solid var(--dl-border); position: sticky; top: 0; background: var(--dl-bg-elevated); }
-.dl-notif-item { display: flex; gap: var(--dl-space-3); padding: var(--dl-space-4) var(--dl-space-5); border-bottom: 1px solid var(--dl-border); transition: background var(--dl-duration-fast); cursor: pointer; }
+.dl-notif-item { display: flex; align-items: flex-start; gap: var(--dl-space-3); padding: var(--dl-space-4) var(--dl-space-5); border-bottom: 1px solid var(--dl-border); transition: background var(--dl-duration-fast); cursor: pointer; }
 .dl-notif-item:hover { background: var(--dl-bg-hover); }
 .dl-notif-item.unread { background: var(--dl-signal-dim); }
-.dl-notif-icon { width: 36px; height: 36px; border-radius: var(--dl-radius-sm); display: grid; place-items: center; flex-shrink: 0; }
-.dl-notif-body strong { display: block; font-size: var(--dl-text-sm); }
+.dl-notif-icon { width: 36px; height: 36px; border-radius: var(--dl-radius-sm); display: grid; place-items: center; flex: 0 0 36px; background: var(--dl-signal-dim); color: var(--dl-accent); }
+.dl-notif-icon::before { font-size: 1.05rem; line-height: 1; }
+.dl-notif-icon[data-type="achievement"] { background: var(--dl-amber-dim); color: var(--dl-amber); }
+.dl-notif-icon[data-type="achievement"]::before { content: "★"; }
+.dl-notif-icon[data-type="streak"] { background: var(--dl-coral-dim); color: var(--dl-coral); }
+.dl-notif-icon[data-type="streak"]::before { content: "↗"; }
+.dl-notif-icon[data-type="mission"]::before { content: "◆"; }
+.dl-notif-icon[data-type="xp"] { background: var(--dl-amber-dim); color: var(--dl-amber); }
+.dl-notif-icon[data-type="xp"]::before { content: "✦"; }
+.dl-notif-body { flex: 1; min-width: 0; }
+.dl-notif-body strong { display: block; font-size: var(--dl-text-sm); line-height: 1.35; }
 .dl-notif-body p { font-size: var(--dl-text-xs); color: var(--dl-text-muted); margin-top: 2px; }
 .dl-notif-time { font-size: 0.65rem; color: var(--dl-text-subtle); margin-top: var(--dl-space-1); }
 

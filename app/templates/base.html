@@ -140,7 +140,7 @@
     </div>
     {% for notif in notifications %}
     <div class="dl-notif-item {% if notif.unread %}unread{% endif %}">
-      <div class="dl-notif-icon">{{ notif.icon }}</div>
+      <div class="dl-notif-icon" data-type="{{ notif.type }}" aria-label="{{ notif.title }}" role="img"></div>
       <div class="dl-notif-body">
         <strong>{{ notif.title }}</strong>
         <p>{{ notif.body }}</p>
