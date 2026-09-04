@@ -140,6 +140,8 @@ def _catalog_activity_type(level_id: int, order_index: int, declared_type: str, 
         if all(isinstance(value, list) for value in answer.values()):
             return "classification"
         return "matching"
+    if isinstance(answer, str) and order_index % 2 == 0:
+        return "concept_choice"
     return "written"
 
 

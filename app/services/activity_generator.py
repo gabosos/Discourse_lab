@@ -6,7 +6,7 @@ import json
 import random
 from typing import Any
 
-from app.infrastructure.database import get_recent_activity_fingerprints, record_activity_item
+from app.infrastructure.database import get_activities_by_level, get_recent_activity_fingerprints, record_activity_item
 
 
 CONTENT_BANK = {
@@ -113,6 +113,23 @@ def _authored_payload(activity: dict[str, Any]) -> dict[str, Any]:
     if kind == "matching" and isinstance(answer, dict):
         pairs = [{"left": key.replace("_", "/"), "right": str(value)} for key, value in answer.items()]
         return {"hint": "Relaciona cada elemento con la explicación correcta según la instrucción.", "pairs": pairs}
+    if kind == "concept_choice" and isinstance(answer, str):
+        distractors = []
+        for candidate in get_activities_by_level(activity["level_id"]):
+            candidate_payload = candidate.get("payload") or {}
+            if isinstance(candidate_payload, str):
+                try:
+                    candidate_payload = json.loads(candidate_payload)
+                except json.JSONDecodeError:
+                    candidate_payload = {}
+            candidate_answer = candidate_payload.get("answer") if isinstance(candidate_payload, dict) else None
+            if isinstance(candidate_answer, str) and candidate_answer != answer and candidate_answer not in distractors:
+                distractors.append(candidate_answer)
+            if len(distractors) == 2:
+                break
+        options = [{"id": "correct", "text": answer, "correct": True}]
+        options.extend({"id": f"distractor-{index}", "text": value, "correct": False} for index, value in enumerate(distractors))
+        return {"hint": "Selecciona la respuesta que mejor resuelve la consigna.", "items": options, "interaction_prompt": "Selecciona la respuesta que mejor resuelve la consigna."}
     if kind == "order" and isinstance(answer, list):
         items = [{"id": f"sentence-{index}", "text": sentence} for index, sentence in enumerate(answer)]
         return {"hint": "Ordena los fragmentos para reconstruir la secuencia indicada.", "items": items, "correct_order": [item["id"] for item in items]}

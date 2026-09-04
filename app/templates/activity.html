@@ -18,7 +18,7 @@
       </div>
       <div>
         <span class="dl-muted" style="font-size:var(--dl-text-xs)">Instrucciones</span>
-        <strong style="display:block;font-size:var(--dl-text-sm)">{{ activity.instructions }}</strong>
+        <strong style="display:block;font-size:var(--dl-text-sm)">{% if activity.activity_type == 'concept_choice' %}Selecciona la respuesta que mejor resuelve la consigna.{% else %}{{ activity.instructions }}{% endif %}</strong>
       </div>
       <div>
         <span class="dl-muted" style="font-size:var(--dl-text-xs)">XP disponible</span>
