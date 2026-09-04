@@ -89,15 +89,34 @@ def _payload_for(activity: dict[str, Any], ctx: dict[str, str], rng: random.Rand
     return activity["payload"]
 
 
+def _authored_payload(activity: dict[str, Any]) -> dict[str, Any]:
+    payload = activity.get("payload") or {}
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except json.JSONDecodeError:
+            payload = {}
+    embedded_answer = payload.get("answer") if isinstance(payload, dict) else None
+    if isinstance(payload, dict) and payload.get("items"):
+        return payload
+
+    answer = activity.get("answer") or embedded_answer
+    kind = activity.get("activity_type")
+    if kind == "classification" and isinstance(answer, dict):
+        categories = [{"id": category, "label": category.replace("_", " ").title()} for category in answer]
+        items = [
+            {"id": f"item-{index}", "text": item, "category": category}
+            for category, values in answer.items()
+            for index, item in enumerate(values)
+        ]
+        return {"hint": "Clasifica cada elemento según el criterio indicado en la instrucción.", "categories": categories, "items": items}
+    if kind == "order" and isinstance(answer, list):
+        items = [{"id": f"sentence-{index}", "text": sentence} for index, sentence in enumerate(answer)]
+        return {"hint": "Ordena los fragmentos para reconstruir la secuencia indicada.", "items": items, "correct_order": [item["id"] for item in items]}
+    return {}
+
+
 def generate_activity_payload(user_id: int, activity: dict[str, Any]) -> dict[str, Any]:
-    recent = get_recent_activity_fingerprints(user_id, activity["id"])
     difficulty = _difficulty(activity)
-    for _ in range(40):
-        rng = random.Random(random.SystemRandom().randint(0, 2**63 - 1))
-        ctx = _context(rng)
-        fingerprint = hashlib.sha256(f"{activity['id']}|{ctx['category']}|{ctx['sentence']}".encode()).hexdigest()[:24]
-        if fingerprint not in recent:
-            payload = _payload_for(activity, ctx, rng)
-            record_activity_item(user_id, activity["id"], fingerprint, ctx["category"], difficulty)
-            return {**payload, "meta": {"category": ctx["category"], "difficulty": difficulty, "difficulty_label": _difficulty_label(difficulty), "dynamic": True}}
-    return {**_payload_for(activity, _context(random.Random()), random.Random()), "meta": {"difficulty": difficulty, "difficulty_label": _difficulty_label(difficulty), "dynamic": True}}
+    payload = _authored_payload(activity)
+    return {**payload, "meta": {"difficulty": difficulty, "difficulty_label": _difficulty_label(difficulty), "dynamic": False}}

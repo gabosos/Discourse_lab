@@ -21,7 +21,8 @@ os.environ["INITIAL_TEACHER_EMAIL"] = "docente@example.test"
 os.environ["INITIAL_TEACHER_PASSWORD"] = "Clave-de-prueba-123"
 
 from app import create_app  # noqa: E402
-from app.infrastructure.database import get_user_progress, get_activity_progress, get_route_mode, get_user_by_email, get_activities_by_level  # noqa: E402
+from app.infrastructure.database import get_user_progress, get_activity_progress, get_route_mode, get_user_by_email, get_activities_by_level, get_activity_by_slug  # noqa: E402
+from app.services.activity_generator import generate_activity_payload  # noqa: E402
 
 
 class EndToEndTests(unittest.TestCase):
@@ -36,6 +37,10 @@ class EndToEndTests(unittest.TestCase):
         activity_types = {activity["activity_type"] for level_id in range(1, 7) for activity in get_activities_by_level(level_id)}
         self.assertGreaterEqual(len(activity_types), 3)
         self.assertIn("written", activity_types)
+        authored = get_activity_by_slug("block1-ej-1")
+        authored_payload = generate_activity_payload(2, authored)
+        self.assertIn("pan", {item["text"] for item in authored_payload["items"]})
+        self.assertNotIn("nuevo protocolo", str(authored_payload).lower())
 
         student = self.app.test_client()
         for path in ("/", "/register", "/login", "/dashboard", "/profile", "/levels/1", "/cuadernillo/view", "/final-project", "/certificate"):
